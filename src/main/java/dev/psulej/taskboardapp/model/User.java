@@ -1,4 +1,5 @@
 package dev.psulej.taskboardapp.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,6 +16,7 @@ public class User {
     private final String login;
 
     @Field
+    @JsonIgnore
     private String password;
 
     public User(UUID id, String login, String password) {

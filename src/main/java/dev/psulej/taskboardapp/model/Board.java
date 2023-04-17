@@ -1,5 +1,7 @@
 package dev.psulej.taskboardapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -44,5 +46,21 @@ public class Board {
 
     public List<Column> getColumns() {
         return columns;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
     }
 }
