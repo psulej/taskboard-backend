@@ -14,16 +14,16 @@ import java.util.UUID;
 @Document("boards")
 public class Board {
     @Id
-    private UUID id;
+    private final UUID id;
 
     @Field
-    private String name;
+    private final String name;
 
     @DBRef
-    private List<User> users;
+    private final List<User> users;
 
     @DBRef
-    private List<Column> columns;
+    private final List<Column> columns;
 
     public Board(UUID id, String name, List<User> users, List<Column> columns) {
         this.id = id;
@@ -46,21 +46,5 @@ public class Board {
 
     public List<Column> getColumns() {
         return columns;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public void setColumns(List<Column> columns) {
-        this.columns = columns;
     }
 }
