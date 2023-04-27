@@ -39,6 +39,9 @@ public class BoardController {
         return new Column(UUID.randomUUID(), createColumn.title(), List.of());
     }
 
+//    @DeleteMapping("/{id}/columns")
+//    public Column deleteColumn(){}
+
     @PutMapping("/{id}/columns")
     public void updateColumns(
             @PathVariable UUID id,
