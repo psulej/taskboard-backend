@@ -2,9 +2,11 @@ package dev.psulej.taskboardapp.controller;
 
 import dev.psulej.taskboardapp.api.AvailableBoard;
 import dev.psulej.taskboardapp.api.CreateColumn;
+import dev.psulej.taskboardapp.api.CreateTask;
 import dev.psulej.taskboardapp.api.UpdateColumn;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
+import dev.psulej.taskboardapp.model.Task;
 import dev.psulej.taskboardapp.service.BoardService;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,4 +52,12 @@ public class BoardController {
         boardService.updateColumns(id,columns);
     }
 
+    @PostMapping("/{boardId}/columns/{columnId}/tasks")
+    public Task addTask(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @RequestBody CreateTask createTask
+            ){
+        return boardService.addTask(boardId,columnId,createTask);
+    }
 }

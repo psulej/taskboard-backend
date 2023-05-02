@@ -2,13 +2,14 @@ package dev.psulej.taskboardapp.service;
 
 import dev.psulej.taskboardapp.api.AvailableBoard;
 import dev.psulej.taskboardapp.api.CreateColumn;
+import dev.psulej.taskboardapp.api.CreateTask;
 import dev.psulej.taskboardapp.api.UpdateColumn;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
 import dev.psulej.taskboardapp.repository.BoardRepository;
 import dev.psulej.taskboardapp.repository.ColumnRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.psulej.taskboardapp.repository.TaskRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -26,10 +27,13 @@ public class BoardService {
 
     private final ColumnRepository columnRepository;
 
-    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository) {
+    private final TaskRepository taskRepository;
+
+    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository, TaskRepository taskRepository) {
         this.mongoTemplate = mongoTemplate;
         this.boardRepository = boardRepository;
         this.columnRepository = columnRepository;
+        this.taskRepository = taskRepository;
     }
 
     public List<AvailableBoard> getAvailableBoards(){
@@ -110,5 +114,23 @@ public class BoardService {
 
         boardRepository.save(newBoard);
         return column;
+    }
+
+    public Task addTask(UUID boardId, UUID columnId, CreateTask createTask) {
+
+        Column column = columnRepository.findById(columnId).orElseThrow(()
+                -> new IllegalArgumentException("Column not found"));
+
+        Task newTask = new Task(UUID.randomUUID(), createTask.title(), createTask.description());
+
+        List<Task> oldTasksList = column.getTasks();
+        List<Task> newTaskList = new ArrayList<>(oldTasksList);
+        newTaskList.add(newTask);
+        taskRepository.save(newTask);
+
+        Column newColumn = new Column(columnId, column.getName(), newTaskList);
+        columnRepository.save(newColumn);
+
+        return newTask;
     }
 }
