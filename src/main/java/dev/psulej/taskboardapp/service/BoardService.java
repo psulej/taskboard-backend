@@ -133,4 +133,27 @@ public class BoardService {
 
         return newTask;
     }
+
+    public void deleteColumn(UUID boardId, UUID columnId) {
+        Board board = getBoard(boardId);
+        List<Column> oldColumnList = board.getColumns();
+        List<Column> newColumnList = oldColumnList.stream().filter(column -> column.getId() != columnId).toList();
+        Board newBoard = new Board(board.getId(),board.getName(), board.getUsers(), newColumnList);
+        boardRepository.save(newBoard);
+        columnRepository.deleteById(columnId);
+    }
+
+    public void deleteTask(UUID boardId, UUID columnId, UUID taskId) {
+
+        Column column = columnRepository.findById(columnId).orElseThrow(()
+                -> new IllegalArgumentException("Column not found"));
+
+        List<Task> oldTasksList = column.getTasks();
+        List<Task> newTaskList = oldTasksList.stream().filter(task -> task.getId() != taskId).toList();
+
+        Column newColumn = new Column(column.getId(), column.getName(), newTaskList);
+
+        columnRepository.save(newColumn);
+        taskRepository.deleteById(taskId);
+    }
 }

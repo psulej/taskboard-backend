@@ -41,8 +41,13 @@ public class BoardController {
         return boardService.addColumn(id, createColumn);
     }
 
-//    @DeleteMapping("/{id}/columns")
-//    public Column deleteColumn(){}
+    @DeleteMapping("/{boardId}/columns/{columnId}")
+    public void deleteColumn(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId
+    ){
+        boardService.deleteColumn(boardId, columnId);
+    }
 
     @PutMapping("/{id}/columns")
     public void updateColumns(
@@ -59,5 +64,14 @@ public class BoardController {
             @RequestBody CreateTask createTask
             ){
         return boardService.addTask(boardId,columnId,createTask);
+    }
+
+    @DeleteMapping("{boardId}/columns/{columnId}/tasks/{taskId}")
+    public void deleteTask(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @PathVariable UUID taskId
+            ){
+        boardService.deleteTask(boardId,columnId,taskId);
     }
 }
