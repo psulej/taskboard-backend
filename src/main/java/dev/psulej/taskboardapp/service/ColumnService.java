@@ -7,5 +7,9 @@ public class ColumnService {
     ColumnRepository columnRepository;
     public ColumnService(ColumnRepository columnRepository) {
         this.columnRepository = columnRepository;
+
+//        public void addColumn(UUID id) {
+//
+//        }
     }
 }

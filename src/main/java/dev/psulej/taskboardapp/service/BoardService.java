@@ -1,6 +1,7 @@
 package dev.psulej.taskboardapp.service;
 
 import dev.psulej.taskboardapp.api.AvailableBoard;
+import dev.psulej.taskboardapp.api.CreateColumn;
 import dev.psulej.taskboardapp.api.UpdateColumn;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
@@ -23,9 +24,12 @@ public class BoardService {
     private final MongoTemplate mongoTemplate;
     private final BoardRepository boardRepository;
 
-    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository) {
+    private final ColumnRepository columnRepository;
+
+    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository) {
         this.mongoTemplate = mongoTemplate;
         this.boardRepository = boardRepository;
+        this.columnRepository = columnRepository;
     }
 
     public List<AvailableBoard> getAvailableBoards(){
@@ -41,9 +45,6 @@ public class BoardService {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
     }
-
-    @Autowired
-    ColumnRepository columnRepository;
 
     public void updateColumns(UUID id,List<UpdateColumn> updatedColumns) {
         Board board = getBoard(id);
@@ -94,5 +95,20 @@ public class BoardService {
         boardRepository.save(newBoard);
 
         System.out.println("boardId: " + id);
+    }
+
+    public Column addColumn(UUID id, CreateColumn createColumn){
+        Board board = getBoard(id);
+        Column column = new Column(UUID.randomUUID(),createColumn.title(),List.of());
+        columnRepository.save(column);
+
+        List<Column> oldColumns = board.getColumns();
+        List<Column> newColumns = new ArrayList<>(oldColumns);
+        newColumns.add(column);
+
+        Board newBoard = new Board(id,board.getName(), board.getUsers(), newColumns);
+
+        boardRepository.save(newBoard);
+        return column;
     }
 }

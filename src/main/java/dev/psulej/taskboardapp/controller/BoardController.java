@@ -36,7 +36,7 @@ public class BoardController {
             @PathVariable UUID id,
             @RequestBody CreateColumn createColumn
     ) {
-        return new Column(UUID.randomUUID(), createColumn.title(), List.of());
+        return boardService.addColumn(id, createColumn);
     }
 
 //    @DeleteMapping("/{id}/columns")
@@ -49,4 +49,5 @@ public class BoardController {
             ){
         boardService.updateColumns(id,columns);
     }
+
 }

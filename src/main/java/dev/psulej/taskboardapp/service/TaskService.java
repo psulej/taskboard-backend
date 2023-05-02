@@ -1,5 +1,6 @@
 package dev.psulej.taskboardapp.service;
 import dev.psulej.taskboardapp.api.CreateTask;
+import dev.psulej.taskboardapp.model.Task;
 import dev.psulej.taskboardapp.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ public class TaskService {
     }
 
     // POST /boards/{boardId}/columns/{columnId}/tasks
-    void addTask(UUID boardId, UUID columnId, CreateTask task){
-
+    void addTask(UUID boardId, UUID columnId, CreateTask task) {
+//        taskRepository.save(new Task)
     }
 }
