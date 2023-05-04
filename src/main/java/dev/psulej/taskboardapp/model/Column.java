@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Document("columns")
@@ -39,6 +40,25 @@ public class Column {
         return tasks;
     }
 
+    @Override
+    public String toString() {
+        return "Column{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tasks=" + tasks +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Column column = (Column) o;
+        return id.equals(column.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

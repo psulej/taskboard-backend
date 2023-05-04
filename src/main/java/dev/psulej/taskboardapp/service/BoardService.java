@@ -52,7 +52,7 @@ public class BoardService {
 
     public void updateColumns(UUID id,List<UpdateColumn> updatedColumns) {
         Board board = getBoard(id);
-
+        
         Map<UUID,Task> tasksById = board.getColumns().stream()
                 .map(Column::getTasks)
                 .flatMap(Collection::stream)
