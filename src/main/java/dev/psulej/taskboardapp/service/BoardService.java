@@ -52,7 +52,14 @@ public class BoardService {
 
     public void updateColumns(UUID id,List<UpdateColumn> updatedColumns) {
         Board board = getBoard(id);
-        
+
+        Map<UUID,List<Task>> taskCount = board.getColumns().stream()
+                .map(Column::getTasks)
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(
+                        Task::getId
+                ));
+
         Map<UUID,Task> tasksById = board.getColumns().stream()
                 .map(Column::getTasks)
                 .flatMap(Collection::stream)
@@ -137,7 +144,7 @@ public class BoardService {
     public void deleteColumn(UUID boardId, UUID columnId) {
         Board board = getBoard(boardId);
         List<Column> oldColumnList = board.getColumns();
-        List<Column> newColumnList = oldColumnList.stream().filter(column -> column.getId() != columnId).toList();
+        List<Column> newColumnList = oldColumnList.stream().filter(column -> !column.getId().equals(columnId)).toList();
         Board newBoard = new Board(board.getId(),board.getName(), board.getUsers(), newColumnList);
         boardRepository.save(newBoard);
         columnRepository.deleteById(columnId);
