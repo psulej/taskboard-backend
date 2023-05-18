@@ -1,9 +1,6 @@
 package dev.psulej.taskboardapp.controller;
 
-import dev.psulej.taskboardapp.api.AvailableBoard;
-import dev.psulej.taskboardapp.api.CreateColumn;
-import dev.psulej.taskboardapp.api.CreateTask;
-import dev.psulej.taskboardapp.api.UpdateColumn;
+import dev.psulej.taskboardapp.api.*;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
@@ -52,7 +49,7 @@ public class BoardController {
     @PutMapping("/{id}/columns")
     public void updateColumns(
             @PathVariable UUID id,
-            @RequestBody List<UpdateColumn> columns
+            @RequestBody List<UpdateColumnTasks> columns
             ){
         boardService.updateColumns(id,columns);
     }
@@ -66,6 +63,25 @@ public class BoardController {
         return boardService.addTask(boardId,columnId,createTask);
     }
 
+    @PutMapping("/{boardId}/columns/{columnId}/tasks/{taskId}")
+    public Task editTask(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @PathVariable UUID taskId,
+            @RequestBody UpdateTask updateTask
+    ){
+        return boardService.editTask(boardId,columnId, taskId, updateTask);
+    }
+
+    @PutMapping("/{boardId}/columns/{columnId}")
+    public Column editColumn(
+            @PathVariable UUID boardId,
+            @PathVariable UUID columnId,
+            @RequestBody UpdateColumn updateColumn
+    ) {
+        return boardService.editColumn(boardId, columnId, updateColumn);
+    }
+
     @DeleteMapping("{boardId}/columns/{columnId}/tasks/{taskId}")
     public void deleteTask(
             @PathVariable UUID boardId,
@@ -74,4 +90,5 @@ public class BoardController {
             ){
         boardService.deleteTask(boardId,columnId,taskId);
     }
+
 }

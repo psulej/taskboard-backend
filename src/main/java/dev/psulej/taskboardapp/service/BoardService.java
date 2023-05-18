@@ -1,9 +1,6 @@
 package dev.psulej.taskboardapp.service;
 
-import dev.psulej.taskboardapp.api.AvailableBoard;
-import dev.psulej.taskboardapp.api.CreateColumn;
-import dev.psulej.taskboardapp.api.CreateTask;
-import dev.psulej.taskboardapp.api.UpdateColumn;
+import dev.psulej.taskboardapp.api.*;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
@@ -24,9 +21,7 @@ public class BoardService {
 
     private final MongoTemplate mongoTemplate;
     private final BoardRepository boardRepository;
-
     private final ColumnRepository columnRepository;
-
     private final TaskRepository taskRepository;
 
     public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository, TaskRepository taskRepository) {
@@ -50,26 +45,26 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
     }
 
-    public void updateColumns(UUID id,List<UpdateColumn> updatedColumns) {
+    public void updateColumns(UUID id,List<UpdateColumnTasks> updatedColumns) {
         Board board = getBoard(id);
 
-        Map<UUID,List<Task>> taskCount = board.getColumns().stream()
-                .map(Column::getTasks)
+        Map<UUID,List<Task>> taskCount = board.columns().stream()
+                .map(Column::tasks)
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingBy(
-                        Task::getId
+                        Task::id
                 ));
 
-        Map<UUID,Task> tasksById = board.getColumns().stream()
-                .map(Column::getTasks)
+        Map<UUID,Task> tasksById = board.columns().stream()
+                .map(Column::tasks)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(
-                        Task::getId,
+                        Task::id,
                         Function.identity()
                 ));
 
-        Map<UUID, Column> columnsById = board.getColumns().stream().collect(Collectors.toMap(
-                Column::getId,
+        Map<UUID, Column> columnsById = board.columns().stream().collect(Collectors.toMap(
+                Column::id,
                 Function.identity()
         ));
 
@@ -95,14 +90,14 @@ public class BoardService {
                 newTasks.add(task);
             });
 
-            Column newColumn = new Column(column.getId(), column.getName(), newTasks);
+            Column newColumn = new Column(column.id(), column.name(), newTasks);
 
             columnRepository.save(newColumn);
 
             newColumns.add(newColumn);
         });
 
-        Board newBoard = new Board(board.getId(), board.getName(), board.getUsers(), newColumns);
+        Board newBoard = new Board(board.id(), board.name(), board.users(), newColumns);
         boardRepository.save(newBoard);
 
         System.out.println("boardId: " + id);
@@ -113,11 +108,11 @@ public class BoardService {
         Column column = new Column(UUID.randomUUID(),createColumn.title(),List.of());
         columnRepository.save(column);
 
-        List<Column> oldColumns = board.getColumns();
+        List<Column> oldColumns = board.columns();
         List<Column> newColumns = new ArrayList<>(oldColumns);
         newColumns.add(column);
 
-        Board newBoard = new Board(id,board.getName(), board.getUsers(), newColumns);
+        Board newBoard = new Board(id,board.name(), board.users(), newColumns);
 
         boardRepository.save(newBoard);
         return column;
@@ -128,14 +123,14 @@ public class BoardService {
         Column column = columnRepository.findById(columnId).orElseThrow(()
                 -> new IllegalArgumentException("Column not found"));
 
-        Task newTask = new Task(UUID.randomUUID(), createTask.title(), createTask.description());
+        Task newTask = new Task(UUID.randomUUID(), createTask.title(), createTask.description(), null);
 
-        List<Task> oldTasksList = column.getTasks();
+        List<Task> oldTasksList = column.tasks();
         List<Task> newTaskList = new ArrayList<>(oldTasksList);
         newTaskList.add(newTask);
         taskRepository.save(newTask);
 
-        Column newColumn = new Column(columnId, column.getName(), newTaskList);
+        Column newColumn = new Column(columnId, column.name(), newTaskList);
         columnRepository.save(newColumn);
 
         return newTask;
@@ -143,9 +138,9 @@ public class BoardService {
 
     public void deleteColumn(UUID boardId, UUID columnId) {
         Board board = getBoard(boardId);
-        List<Column> oldColumnList = board.getColumns();
-        List<Column> newColumnList = oldColumnList.stream().filter(column -> !column.getId().equals(columnId)).toList();
-        Board newBoard = new Board(board.getId(),board.getName(), board.getUsers(), newColumnList);
+        List<Column> oldColumnList = board.columns();
+        List<Column> newColumnList = oldColumnList.stream().filter(column -> !column.id().equals(columnId)).toList();
+        Board newBoard = new Board(board.id(),board.name(), board.users(), newColumnList);
         boardRepository.save(newBoard);
         columnRepository.deleteById(columnId);
     }
@@ -155,12 +150,40 @@ public class BoardService {
         Column column = columnRepository.findById(columnId).orElseThrow(()
                 -> new IllegalArgumentException("Column not found"));
 
-        List<Task> oldTasksList = column.getTasks();
-        List<Task> newTaskList = oldTasksList.stream().filter(task -> task.getId() != taskId).toList();
+        List<Task> oldTasksList = column.tasks();
+        List<Task> newTaskList = oldTasksList.stream().filter(task -> task.id() != taskId).toList();
 
-        Column newColumn = new Column(column.getId(), column.getName(), newTaskList);
+        Column newColumn = new Column(column.id(), column.name(), newTaskList);
 
         columnRepository.save(newColumn);
         taskRepository.deleteById(taskId);
     }
+
+    public Task editTask(UUID boardId, UUID columnId, UUID taskId, UpdateTask updateTask) {
+
+        if (!boardRepository.existsById(boardId)) {
+            throw new IllegalArgumentException("Board not found");
+        }
+        if (!columnRepository.existsById(columnId)) {
+            throw new IllegalArgumentException("Column not found");
+        }
+
+        return taskRepository.findById(taskId)
+                .map(task -> new Task(task.id(), updateTask.title(), updateTask.description(), null))
+                .map(taskRepository::save)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+    }
+
+    public Column editColumn(UUID boardId, UUID columnId, UpdateColumn updateColumn) {
+
+        if (!boardRepository.existsById(boardId)) {
+            throw new IllegalArgumentException("Board not found");
+        }
+
+        return columnRepository.findById(columnId)
+                .map(column -> new Column(column.id(), updateColumn.title(), column.tasks()))
+                .map(columnRepository::save)
+                .orElseThrow(() -> new IllegalArgumentException("Column not found"));
+    }
+
 }

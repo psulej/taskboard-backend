@@ -1,7 +1,6 @@
 package dev.psulej.taskboardapp;
 
 
-
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
@@ -15,7 +14,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.List;
 
@@ -40,30 +38,67 @@ public class TaskBoardAppApplication implements CommandLineRunner {
 
     }
 
-    public static void main(String[] args) {SpringApplication.run(TaskBoardAppApplication.class, args);}
+    public static void main(String[] args) {
+        SpringApplication.run(TaskBoardAppApplication.class, args);
+    }
 
     @Override
     public void run(String... args) throws Exception {
+
+
         if (userRepository.findAll().isEmpty() && boardRepository.findAll().isEmpty() && taskRepository.findAll().isEmpty() && columnRepository.findAll().isEmpty()) {
             List<User> users = List.of(
-                    new User(UUID.fromString("408196f3-62dd-40ec-b66c-50734c92b769"), "jdoe", "testpass"),
-                    new User(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"), "asmith", "testpass2")
+                    User.builder()
+                            .id(UUID.fromString("408196f3-62dd-40ec-b66c-50734c92b769"))
+                            .login("jdoe")
+                            .password("testpass")
+                            .build(),
+                    User.builder()
+                            .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
+                            .login("asmith")
+                            .password("testpass2")
+                            .build()
             );
+
             userRepository.saveAll(users);
 
             List<Task> column1Tasks = List.of(
-                    new Task(UUID.fromString("de656f7a-bf69-4ac6-9216-2fb6405d5480"), "Col1Task1", "Col1Task1"),
-                    new Task(UUID.fromString("cad0fcc2-0f73-47ea-9de2-92b63270be84"), "Col1Task2", "Col1Task2")
+                    Task.builder()
+                            .id(UUID.fromString("de656f7a-bf69-4ac6-9216-2fb6405d5480"))
+                            .title("Col1Task1")
+                            .description("Col1Task1")
+                            .build(),
+                    Task.builder()
+                            .id(UUID.fromString("cad0fcc2-0f73-47ea-9de2-92b63270be84"))
+                            .title("Col1Task2")
+                            .description("Col1Task2")
+                            .build()
             );
 
             List<Task> column2Tasks = List.of(
-                    new Task(UUID.fromString("6f17d5ae-b931-4de0-a8af-14d134e4c239"), "Col2Task1", "Col2Task1"),
-                    new Task(UUID.fromString("b86f70df-485e-4af4-92f0-726ea7944ec3"), "Col2Task2", "Col2Task2")
+                    Task.builder()
+                            .id(UUID.fromString("6f17d5ae-b931-4de0-a8af-14d134e4c239"))
+                            .title("Col2Task1")
+                            .description("Col2Task1")
+                            .build(),
+                    Task.builder()
+                            .id(UUID.fromString("b86f70df-485e-4af4-92f0-726ea7944ec3"))
+                            .title("Col2Task2")
+                            .description("Col2Task2")
+                            .build()
             );
 
             List<Task> column3Tasks = List.of(
-                    new Task(UUID.fromString("f7efe0b1-4669-46cb-8418-35396f58e797"), "Col3Task1", "Col3Task1"),
-                    new Task(UUID.fromString("422ad8ec-8557-49b8-a57e-4653272e4086"), "Col3Task2", "Col3Task2")
+                    Task.builder()
+                            .id(UUID.fromString("f7efe0b1-4669-46cb-8418-35396f58e797"))
+                            .title("Col3Task1")
+                            .description("Col3Task1")
+                            .build(),
+                    Task.builder()
+                            .id(UUID.fromString("422ad8ec-8557-49b8-a57e-4653272e4086"))
+                            .title("Col3Task2")
+                            .description("Col3Task2")
+                            .build()
             );
 
             taskRepository.saveAll(column1Tasks);
@@ -71,9 +106,21 @@ public class TaskBoardAppApplication implements CommandLineRunner {
             taskRepository.saveAll(column3Tasks);
 
             List<Column> columns = List.of(
-                    new Column(UUID.fromString("5434c9cb-ac5b-4061-9ed6-5e144fee67d1"), "col1", column1Tasks),
-                    new Column(UUID.fromString("f995beda-0dbc-4bca-bd7c-5ce48dba6602"), "col2", column2Tasks),
-                    new Column(UUID.fromString("580a36f5-fb91-440e-9fb1-bc75fc214fc3"), "col3", column3Tasks)
+                    Column.builder()
+                            .id(UUID.fromString("5434c9cb-ac5b-4061-9ed6-5e144fee67d1"))
+                            .name("col1")
+                            .tasks(column1Tasks)
+                            .build(),
+                    Column.builder()
+                            .id(UUID.fromString("f995beda-0dbc-4bca-bd7c-5ce48dba6602"))
+                            .name("col2")
+                            .tasks(column2Tasks)
+                            .build(),
+                    Column.builder()
+                            .id(UUID.fromString("580a36f5-fb91-440e-9fb1-bc75fc214fc3"))
+                            .name("col3")
+                            .tasks(column3Tasks)
+                            .build()
             );
 
             columnRepository.saveAll(columns);
