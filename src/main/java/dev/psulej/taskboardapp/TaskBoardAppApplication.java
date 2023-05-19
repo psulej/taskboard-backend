@@ -125,7 +125,13 @@ public class TaskBoardAppApplication implements CommandLineRunner {
 
             columnRepository.saveAll(columns);
 
-            Board board1 = new Board(UUID.fromString("835aa43b-5baa-400f-b7ca-2aca541ba7b7"), "board1", users, columns);
+            Board board1 = Board.builder()
+                    .id(UUID.fromString("835aa43b-5baa-400f-b7ca-2aca541ba7b7"))
+                    .name("board1")
+                    .users(users)
+                    .columns(columns)
+                    .build();
+
             boardRepository.save(board1);
         }
     }
