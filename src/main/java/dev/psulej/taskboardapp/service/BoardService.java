@@ -3,9 +3,11 @@ import dev.psulej.taskboardapp.api.*;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
+import dev.psulej.taskboardapp.model.User;
 import dev.psulej.taskboardapp.repository.BoardRepository;
 import dev.psulej.taskboardapp.repository.ColumnRepository;
 import dev.psulej.taskboardapp.repository.TaskRepository;
+import dev.psulej.taskboardapp.repository.UserRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,12 +23,14 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository, TaskRepository taskRepository) {
+    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository, TaskRepository taskRepository, UserRepository userRepository) {
         this.mongoTemplate = mongoTemplate;
         this.boardRepository = boardRepository;
         this.columnRepository = columnRepository;
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     public List<AvailableBoard> getAvailableBoards() {
@@ -210,12 +214,18 @@ public class BoardService {
             throw new IllegalArgumentException("Column not found");
         }
 
+        User assignedUser = Optional.ofNullable(updateTask.assignedUserId())
+                .map(assignedUserId ->
+                        userRepository.findById(assignedUserId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found")))
+                .orElse(null);
+
         return taskRepository.findById(taskId)
                 .map(task -> Task.builder()
                         .id(task.id())
                         .title(updateTask.title())
                         .description(updateTask.description())
-                        .assignedUser(null)
+                        .assignedUser(assignedUser)
                         .build())
                 .map(taskRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
