@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Document("users")
 @Builder
-public record User(
+public record  User(
         @Id UUID id,
         @Field String login,
         @Field @JsonIgnore String password

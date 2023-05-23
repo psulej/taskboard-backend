@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class BoardService {
@@ -63,10 +64,12 @@ public class BoardService {
 
     public Board editBoard(UUID boardId, UpdateBoard updateBoard) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
+
+        List<User> boardUsers = board.users();
         Board newBoard = Board.builder()
                 .id(boardId)
                 .name(updateBoard.name())
-                .users(board.users())
+                .users(boardUsers)
                 .columns(board.columns())
                 .build();
         return boardRepository.save(newBoard);
@@ -242,5 +245,13 @@ public class BoardService {
                         .build())
                 .map(columnRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
+    }
+
+
+    public List<User> getAssignableUsers(UUID boardId, String loginPhrase) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        List<UUID> excludedUserIds = board.users().stream().map(User::id).toList();
+        return userRepository.findByIdNotIn(excludedUserIds);
     }
 }

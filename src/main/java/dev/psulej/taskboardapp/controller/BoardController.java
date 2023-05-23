@@ -4,6 +4,7 @@ import dev.psulej.taskboardapp.api.*;
 import dev.psulej.taskboardapp.model.Board;
 import dev.psulej.taskboardapp.model.Column;
 import dev.psulej.taskboardapp.model.Task;
+import dev.psulej.taskboardapp.model.User;
 import dev.psulej.taskboardapp.service.BoardService;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,14 @@ public class BoardController {
             @PathVariable UUID boardId
     ) {
         boardService.deleteBoard(boardId);
+    }
+
+    @GetMapping("/{boardId}/assignable-users")
+    public List<User> getAssignableUsers(
+            @PathVariable UUID boardId,
+            @RequestParam(required = false) String loginPhrase
+    ) {
+        return boardService.getAssignableUsers(boardId, loginPhrase);
     }
 
     @PostMapping("/{boardId}/columns")
