@@ -57,6 +57,16 @@ public class TaskBoardAppApplication implements CommandLineRunner {
                             .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
                             .login("asmith")
                             .password("testpass2")
+                            .build(),
+                    User.builder()
+                            .id(UUID.fromString("661bd63f-d0fe-4c29-b964-72723d3e6837"))
+                            .login("Jack222")
+                            .password("jackiechan")
+                            .build(),
+                    User.builder()
+                            .id(UUID.fromString("567bdb62-af6f-4c01-9013-8966d06e296b"))
+                            .login("WillBill21321")
+                            .password("billiWilli")
                             .build()
             );
 

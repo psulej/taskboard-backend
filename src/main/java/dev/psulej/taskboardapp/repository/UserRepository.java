@@ -14,4 +14,7 @@ public interface UserRepository extends MongoRepository<User, UUID> {
 
     @Query("{ _id:  {$nin:  ?0}}")
     List<User> findByIdNotIn(List<UUID> users);
+
+    @Query("{ $and: [{_id:  {$nin:  ?0} }, { login: { $regex: ?1, $options: 'i'}} ]}")
+    List<User> findByIdNotInAAndLoginStartsWith(List<UUID> users, String loginPhraseRegex);
 }

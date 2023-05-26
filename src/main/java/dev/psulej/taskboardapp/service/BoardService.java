@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -66,6 +67,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
 
         List<User> boardUsers = board.users();
+
         Board newBoard = Board.builder()
                 .id(boardId)
                 .name(updateBoard.name())
@@ -75,7 +77,6 @@ public class BoardService {
         return boardRepository.save(newBoard);
     }
 
-    // TODO
     public void deleteBoard(UUID boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
         boardRepository.deleteById(boardId);
@@ -252,6 +253,12 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found"));
         List<UUID> excludedUserIds = board.users().stream().map(User::id).toList();
-        return userRepository.findByIdNotIn(excludedUserIds);
+
+        if (StringUtils.hasText(loginPhrase)) {
+            String loginPhraseRegex = "^" + loginPhrase + ".*";
+            return userRepository.findByIdNotInAAndLoginStartsWith(excludedUserIds, loginPhraseRegex);
+        } else {
+            return userRepository.findByIdNotIn(excludedUserIds);
+        }
     }
 }
