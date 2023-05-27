@@ -67,11 +67,13 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
 
         List<User> boardUsers = board.users();
+        List<UUID> updatedBoardIds = updateBoard.userIds();
+        List<User> updatedBoardUsers = userRepository.findAllById(updatedBoardIds);
 
         Board newBoard = Board.builder()
                 .id(boardId)
                 .name(updateBoard.name())
-                .users(boardUsers)
+                .users(updatedBoardUsers)
                 .columns(board.columns())
                 .build();
         return boardRepository.save(newBoard);
@@ -125,7 +127,6 @@ public class BoardService {
                     .build();
 
             columnRepository.save(newColumn);
-
             newColumns.add(newColumn);
         });
 
