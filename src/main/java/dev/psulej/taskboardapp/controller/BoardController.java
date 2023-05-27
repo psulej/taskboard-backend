@@ -55,9 +55,10 @@ public class BoardController {
     @GetMapping("/{boardId}/assignable-users")
     public List<User> getAssignableUsers(
             @PathVariable UUID boardId,
-            @RequestParam(required = false) String loginPhrase
+            @RequestParam(required = false) String loginPhrase,
+            @RequestParam(required = false) List<UUID> excludedUserIds
     ) {
-        return boardService.getAssignableUsers(boardId, loginPhrase);
+        return boardService.getAssignableUsers(boardId, loginPhrase, excludedUserIds);
     }
 
     @PostMapping("/{boardId}/columns")

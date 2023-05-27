@@ -249,16 +249,21 @@ public class BoardService {
     }
 
 
-    public List<User> getAssignableUsers(UUID boardId, String loginPhrase) {
+    public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found"));
-        List<UUID> excludedUserIds = board.users().stream().map(User::id).toList();
+        List<UUID> boardUserIds = board.users().stream().map(User::id).toList();
+
+        Set<UUID> allExcludedUserIds = Stream.of(boardUserIds, excludedUserIds)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toUnmodifiableSet());
 
         if (StringUtils.hasText(loginPhrase)) {
             String loginPhraseRegex = "^" + loginPhrase + ".*";
-            return userRepository.findByIdNotInAAndLoginStartsWith(excludedUserIds, loginPhraseRegex);
+            return userRepository.findByIdNotInAAndLoginStartsWith(allExcludedUserIds, loginPhraseRegex);
         } else {
-            return userRepository.findByIdNotIn(excludedUserIds);
+            return userRepository.findByIdNotIn(allExcludedUserIds);
         }
     }
 }
