@@ -2,8 +2,6 @@ package dev.psulej.taskboardapp.controller;
 
 import dev.psulej.taskboardapp.api.*;
 import dev.psulej.taskboardapp.model.Board;
-import dev.psulej.taskboardapp.model.Column;
-import dev.psulej.taskboardapp.model.Task;
 import dev.psulej.taskboardapp.model.User;
 import dev.psulej.taskboardapp.service.BoardService;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +12,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/boards")
 public class BoardController {
-
     BoardService boardService;
 
     public BoardController(BoardService boardService) {
@@ -60,66 +57,4 @@ public class BoardController {
     ) {
         return boardService.getAssignableUsers(boardId, loginPhrase, excludedUserIds);
     }
-
-    @PostMapping("/{boardId}/columns")
-    public Column addColumn(
-            @PathVariable UUID boardId,
-            @RequestBody CreateColumn createColumn
-    ) {
-        return boardService.addColumn(boardId, createColumn);
-    }
-
-    @PutMapping("/{boardId}/columns/{columnId}")
-    public Column editColumn(
-            @PathVariable UUID boardId,
-            @PathVariable UUID columnId,
-            @RequestBody UpdateColumn updateColumn
-    ) {
-        return boardService.editColumn(boardId, columnId, updateColumn);
-    }
-
-    @DeleteMapping("/{boardId}/columns/{columnId}")
-    public void deleteColumn(
-            @PathVariable UUID boardId,
-            @PathVariable UUID columnId
-    ) {
-        boardService.deleteColumn(boardId, columnId);
-    }
-
-    @PutMapping("/{boardId}/columns")
-    public void updateColumns(
-            @PathVariable UUID boardId,
-            @RequestBody List<UpdateColumnTasks> columns
-    ) {
-        boardService.updateColumns(boardId, columns);
-    }
-
-    @PostMapping("/{boardId}/columns/{columnId}/tasks")
-    public Task addTask(
-            @PathVariable UUID boardId,
-            @PathVariable UUID columnId,
-            @RequestBody CreateTask createTask
-    ) {
-        return boardService.addTask(boardId, columnId, createTask);
-    }
-
-    @PutMapping("/{boardId}/columns/{columnId}/tasks/{taskId}")
-    public Task editTask(
-            @PathVariable UUID boardId,
-            @PathVariable UUID columnId,
-            @PathVariable UUID taskId,
-            @RequestBody UpdateTask updateTask
-    ) {
-        return boardService.editTask(boardId, columnId, taskId, updateTask);
-    }
-
-    @DeleteMapping("{boardId}/columns/{columnId}/tasks/{taskId}")
-    public void deleteTask(
-            @PathVariable UUID boardId,
-            @PathVariable UUID columnId,
-            @PathVariable UUID taskId
-    ) {
-        boardService.deleteTask(boardId, columnId, taskId);
-    }
-
 }
