@@ -3,7 +3,6 @@ package dev.psulej.taskboardapp.user.service;
 import dev.psulej.taskboardapp.security.TokenProvider;
 import dev.psulej.taskboardapp.user.domain.UserRole;
 import dev.psulej.taskboardapp.user.dto.RegisterRequest;
-import dev.psulej.taskboardapp.user.exception.DuplicatedUserInfoException;
 import dev.psulej.taskboardapp.user.repository.UserRepository;
 import dev.psulej.taskboardapp.user.domain.User;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +20,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
+    private final UserValidator userValidator;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenProvider tokenProvider) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserValidator userValidator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
+        this.userValidator = userValidator;
     }
 
 
@@ -42,12 +43,7 @@ public class UserService {
     public void register(RegisterRequest registerRequest) {
         Optional<User> t = Optional.empty();
 
-        if (userRepository.findByLoginIgnoreCase(registerRequest.login()).isPresent()) {
-            throw new DuplicatedUserInfoException(String.format("Login %s already been used", registerRequest.login()));
-        }
-        if (userRepository.findByEmailIgnoreCase(registerRequest.email()).isPresent()) {
-            throw new DuplicatedUserInfoException(String.format("Email %s already been used", registerRequest.email()));
-        }
+        userValidator.validate(registerRequest);
 
         User registerUser = User.builder()
                 .id(UUID.randomUUID())
