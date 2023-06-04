@@ -7,14 +7,17 @@ import dev.psulej.taskboardapp.board.repository.BoardRepository;
 import dev.psulej.taskboardapp.board.repository.ColumnRepository;
 import dev.psulej.taskboardapp.board.repository.TaskRepository;
 import dev.psulej.taskboardapp.user.domain.User;
+import dev.psulej.taskboardapp.user.domain.UserRole;
 import dev.psulej.taskboardapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
 public class DatabaseInitializer implements CommandLineRunner {
 
@@ -29,24 +32,12 @@ public class DatabaseInitializer implements CommandLineRunner {
         if (userRepository.findAll().isEmpty() && boardRepository.findAll().isEmpty() && taskRepository.findAll().isEmpty() && columnRepository.findAll().isEmpty()) {
             List<User> users = List.of(
                     User.builder()
-                            .id(UUID.fromString("408196f3-62dd-40ec-b66c-50734c92b769"))
-                            .login("jdoe")
-                            .password(passwordEncoder.encode("jdoe"))
-                            .build(),
-                    User.builder()
                             .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
                             .login("asmith")
                             .password(passwordEncoder.encode("asmith"))
-                            .build(),
-                    User.builder()
-                            .id(UUID.fromString("661bd63f-d0fe-4c29-b964-72723d3e6837"))
-                            .login("Jack222")
-                            .password(passwordEncoder.encode("jack"))
-                            .build(),
-                    User.builder()
-                            .id(UUID.fromString("567bdb62-af6f-4c01-9013-8966d06e296b"))
-                            .login("WillBill21321")
-                            .password(passwordEncoder.encode("willbill"))
+                            .name("Anna")
+                            .email("asmith@yahoo.com")
+                            .role(UserRole.USER)
                             .build()
             );
 

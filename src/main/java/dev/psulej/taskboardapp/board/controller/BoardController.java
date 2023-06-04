@@ -6,6 +6,7 @@ import dev.psulej.taskboardapp.board.api.UpdateBoard;
 import dev.psulej.taskboardapp.board.domain.Board;
 import dev.psulej.taskboardapp.board.service.BoardService;
 import dev.psulej.taskboardapp.user.domain.User;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +33,14 @@ public class BoardController {
 
     @PostMapping
     public Board addBoard(
-            @RequestBody CreateBoard createBoard) {
+            @Valid @RequestBody CreateBoard createBoard) {
         return boardService.addBoard(createBoard);
     }
 
     @PutMapping("/{boardId}")
     public Board editBoard(
             @PathVariable UUID boardId,
-            @RequestBody UpdateBoard updateBoard
+            @Valid @RequestBody UpdateBoard updateBoard
     ) {
         return boardService.editBoard(boardId, updateBoard);
     }

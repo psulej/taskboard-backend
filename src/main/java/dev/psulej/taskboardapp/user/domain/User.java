@@ -11,11 +11,18 @@ import java.util.UUID;
 @Builder
 public record  User(
         @Id UUID id,
+
         @Field String login,
+
         @Field String email,
+
         @Field String name,
+
         @Field UserRole role,
-        @Field @JsonIgnore String password
+
+        @Field
+        @JsonIgnore
+        String password
 ) {
 }
 

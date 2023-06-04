@@ -24,7 +24,6 @@ public class ColumnService {
         this.boardRepository = boardRepository;
     }
 
-
     public void updateColumns(UUID boardId, List<UpdateColumnTasks> updatedColumns) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));

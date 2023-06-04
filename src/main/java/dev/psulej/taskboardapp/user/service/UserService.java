@@ -1,5 +1,6 @@
 package dev.psulej.taskboardapp.user.service;
 
+import dev.psulej.taskboardapp.security.ApplicationUserDetails;
 import dev.psulej.taskboardapp.security.TokenProvider;
 import dev.psulej.taskboardapp.user.domain.UserRole;
 import dev.psulej.taskboardapp.user.dto.RegisterRequest;
@@ -8,11 +9,16 @@ import dev.psulej.taskboardapp.user.domain.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Service
 public class UserService {
@@ -32,7 +38,14 @@ public class UserService {
 
 
     public User getLoggedUser() {
-        return findUserByLogin("asmith")
+        String login = Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal.getClass().isAssignableFrom(ApplicationUserDetails.class))
+                .map(principal -> (ApplicationUserDetails) principal)
+                .map(ApplicationUserDetails::getLogin)
+                .orElseThrow(() -> new IllegalStateException("User cannot be extracted"));
+        return findUserByLogin(login)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 

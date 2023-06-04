@@ -5,6 +5,7 @@ import dev.psulej.taskboardapp.board.api.UpdateColumn;
 import dev.psulej.taskboardapp.board.api.UpdateColumnTasks;
 import dev.psulej.taskboardapp.board.domain.Column;
 import dev.psulej.taskboardapp.board.service.ColumnService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class ColumnController {
     @PostMapping("/{boardId}/columns")
     public Column addColumn(
             @PathVariable UUID boardId,
-            @RequestBody CreateColumn createColumn
+            @Valid @RequestBody CreateColumn createColumn
     ) {
         return columnService.addColumn(boardId, createColumn);
     }
@@ -30,7 +31,7 @@ public class ColumnController {
     public Column editColumn(
             @PathVariable UUID boardId,
             @PathVariable UUID columnId,
-            @RequestBody UpdateColumn updateColumn
+            @Valid @RequestBody UpdateColumn updateColumn
     ) {
         return columnService.editColumn(boardId, columnId, updateColumn);
     }

@@ -4,6 +4,7 @@ import dev.psulej.taskboardapp.board.api.CreateTask;
 import dev.psulej.taskboardapp.board.api.UpdateTask;
 import dev.psulej.taskboardapp.board.domain.Task;
 import dev.psulej.taskboardapp.board.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class TaskController {
     public Task addTask(
             @PathVariable UUID boardId,
             @PathVariable UUID columnId,
-            @RequestBody CreateTask createTask
+            @Valid @RequestBody CreateTask createTask
     ) {
         return taskService.addTask(boardId, columnId, createTask);
     }
@@ -31,7 +32,7 @@ public class TaskController {
             @PathVariable UUID boardId,
             @PathVariable UUID columnId,
             @PathVariable UUID taskId,
-            @RequestBody UpdateTask updateTask
+            @Valid @RequestBody UpdateTask updateTask
     ) {
         return taskService.editTask(boardId, columnId, taskId, updateTask);
     }
