@@ -1,7 +1,6 @@
 package dev.psulej.taskboardapp.security;
 import dev.psulej.taskboardapp.user.domain.User;
 import dev.psulej.taskboardapp.user.repository.UserRepository;
-import dev.psulej.taskboardapp.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

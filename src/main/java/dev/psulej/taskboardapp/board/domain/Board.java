@@ -1,7 +1,6 @@
 package dev.psulej.taskboardapp.board.domain;
 
 import dev.psulej.taskboardapp.user.domain.User;
-import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

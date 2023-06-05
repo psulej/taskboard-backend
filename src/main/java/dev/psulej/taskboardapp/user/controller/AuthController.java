@@ -1,7 +1,7 @@
 package dev.psulej.taskboardapp.user.controller;
-import dev.psulej.taskboardapp.user.dto.LoginRequest;
-import dev.psulej.taskboardapp.user.dto.LoginResponse;
-import dev.psulej.taskboardapp.user.dto.RegisterRequest;
+import dev.psulej.taskboardapp.user.api.LoginRequest;
+import dev.psulej.taskboardapp.user.api.LoginResponse;
+import dev.psulej.taskboardapp.user.api.RegisterRequest;
 import dev.psulej.taskboardapp.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

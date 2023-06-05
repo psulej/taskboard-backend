@@ -2,7 +2,7 @@ package dev.psulej.taskboardapp.user.service;
 
 import dev.psulej.taskboardapp.error.ApplicationError;
 import dev.psulej.taskboardapp.error.ApplicationException;
-import dev.psulej.taskboardapp.user.dto.RegisterRequest;
+import dev.psulej.taskboardapp.user.api.RegisterRequest;
 import dev.psulej.taskboardapp.user.repository.UserRepository;
 import org.springframework.stereotype.Component;
 

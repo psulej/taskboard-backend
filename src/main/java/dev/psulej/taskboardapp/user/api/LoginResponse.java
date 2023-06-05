@@ -1,4 +1,4 @@
-package dev.psulej.taskboardapp.user.dto;
+package dev.psulej.taskboardapp.user.api;
 
 public record LoginResponse(String accessToken) {
 }

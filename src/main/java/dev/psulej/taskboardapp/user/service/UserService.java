@@ -3,7 +3,7 @@ package dev.psulej.taskboardapp.user.service;
 import dev.psulej.taskboardapp.security.ApplicationUserDetails;
 import dev.psulej.taskboardapp.security.TokenProvider;
 import dev.psulej.taskboardapp.user.domain.UserRole;
-import dev.psulej.taskboardapp.user.dto.RegisterRequest;
+import dev.psulej.taskboardapp.user.api.RegisterRequest;
 import dev.psulej.taskboardapp.user.repository.UserRepository;
 import dev.psulej.taskboardapp.user.domain.User;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 @Service
 public class UserService {

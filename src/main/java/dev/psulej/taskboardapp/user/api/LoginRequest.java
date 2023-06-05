@@ -1,4 +1,4 @@
-package dev.psulej.taskboardapp.user.dto;
+package dev.psulej.taskboardapp.user.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
