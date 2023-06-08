@@ -8,4 +8,5 @@ MongoDB Database
 commands for docker:
 
 docker build -t taskboard-backend .
+
 docker-compose up
