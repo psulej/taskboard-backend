@@ -1,5 +1,5 @@
 package dev.psulej.taskboard.user.controller;
-import dev.psulej.taskboard.user.domain.Avatar;
+import dev.psulej.taskboard.user.domain.Image;
 import dev.psulej.taskboard.user.repository.AvatarRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +20,18 @@ public class UserSettingsController {
     private final AvatarRepository avatarRepository;
 
     @PostMapping("/upload-avatar")
-    public ResponseEntity<String> uploadAvatar(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadAvatar(@RequestParam(name = "file") MultipartFile file) {
         try {
             String fileName = file.getOriginalFilename();
-            log.info("Import avatar {}", fileName);
+            log.info("Import fileContent {}", fileName);
 
-            Avatar avatar = Avatar.builder()
+            Image image = Image.builder()
                     .id(UUID.randomUUID())
-                    .name(fileName)
-                    .avatar(new Binary(BsonBinarySubType.BINARY, file.getBytes()))
+                    .fileName(fileName)
+                    .fileContent(new Binary(BsonBinarySubType.BINARY, file.getBytes()))
                     .build();
 
-            avatarRepository.insert(avatar);
+            avatarRepository.insert(image);
 
             return new ResponseEntity<>("Avatar upload successful", HttpStatus.OK);
         } catch (Exception e) {
@@ -40,7 +40,7 @@ public class UserSettingsController {
     }
 
     @GetMapping("/avatar/{id}")
-    public Avatar getAvatar(@PathVariable UUID id) {
+    public Image getAvatar(@PathVariable UUID id) {
         return avatarRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Avatar not found for id: " + id));
     }
 

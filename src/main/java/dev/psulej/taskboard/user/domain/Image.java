@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Document(collation = "avatars")
+@Document(collection = "images")
 @Builder
-public record Avatar(
+public record Image(
         UUID id,
-        String name,
-        Binary avatar
+        String fileName,
+        Binary fileContent
 ) {
 }
