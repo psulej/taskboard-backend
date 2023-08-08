@@ -1,6 +1,9 @@
 package dev.psulej.taskboard.user.controller;
-import dev.psulej.taskboard.user.domain.Image;
-import dev.psulej.taskboard.user.repository.AvatarRepository;
+import dev.psulej.taskboard.image.domain.Image;
+import dev.psulej.taskboard.image.repository.ImageRepository;
+import dev.psulej.taskboard.user.domain.User;
+import dev.psulej.taskboard.user.repository.UserRepository;
+import dev.psulej.taskboard.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonBinarySubType;
@@ -9,39 +12,54 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/user-settings")
+@RequestMapping("/settings")
 @AllArgsConstructor
 public class UserSettingsController {
 
-    private final AvatarRepository avatarRepository;
+    private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
-    @PostMapping("/upload-avatar")
+    @PostMapping("/upload")
     public ResponseEntity<String> uploadAvatar(@RequestParam(name = "file") MultipartFile file) {
         try {
             String fileName = file.getOriginalFilename();
             log.info("Import fileContent {}", fileName);
-
-            Image image = Image.builder()
-                    .id(UUID.randomUUID())
-                    .fileName(fileName)
-                    .fileContent(new Binary(BsonBinarySubType.BINARY, file.getBytes()))
-                    .build();
-
-            avatarRepository.insert(image);
-
+            Image image = persistImage(file, fileName);
+            updateUserImage(image);
             return new ResponseEntity<>("Avatar upload successful", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Upload failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/avatar/{id}")
-    public Image getAvatar(@PathVariable UUID id) {
-        return avatarRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Avatar not found for id: " + id));
+    private Image persistImage(MultipartFile file, String fileName) throws IOException {
+        return imageRepository.insert(
+                Image.builder()
+                        .id(UUID.randomUUID())
+                        .fileName(fileName)
+                        .fileContent(new Binary(BsonBinarySubType.BINARY, file.getBytes()))
+                        .build()
+        );
     }
 
+    private void updateUserImage(Image image) {
+        UUID loggedUserId = userService.getLoggedUser().id();
+        User user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        User updatedUser = User.builder()
+                .id(user.id())
+                .login(user.login())
+                .email(user.email())
+                .name(user.name())
+                .role(user.role())
+                .password(user.password())
+                .imageId(image.id())
+                .build();
+        userRepository.save(updatedUser);
+    }
 }

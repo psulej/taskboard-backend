@@ -1,4 +1,4 @@
-package dev.psulej.taskboard.user.domain;
+package dev.psulej.taskboard.image.domain;
 
 import lombok.Builder;
 import org.bson.types.Binary;

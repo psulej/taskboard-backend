@@ -22,7 +22,9 @@ public record  User(
 
         @Field
         @JsonIgnore
-        String password
+        String password,
+
+        @Field UUID imageId
 ) {
 }
 
