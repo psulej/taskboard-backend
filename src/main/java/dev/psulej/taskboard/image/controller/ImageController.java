@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/images")
+@RequestMapping("public/images")
 @AllArgsConstructor
 public class ImageController {
 
