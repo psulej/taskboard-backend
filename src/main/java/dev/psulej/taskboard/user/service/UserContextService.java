@@ -1,5 +1,6 @@
 package dev.psulej.taskboard.user.service;
 
+import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.api.UserContext;
 import dev.psulej.taskboard.user.domain.User;
 import dev.psulej.taskboard.user.repository.UserRepository;
@@ -25,7 +26,7 @@ public class UserContextService {
                 .email(user.email())
                 .name(user.name())
                 .imageId(user.imageId())
+                .theme(ApplicationTheme.DARK)
                 .build();
-
     }
 }
