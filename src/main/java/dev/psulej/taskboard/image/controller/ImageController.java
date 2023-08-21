@@ -15,14 +15,14 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/public/images")
 @AllArgsConstructor
 public class ImageController {
 
     private final ImageRepository imageRepository;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAvatar(@PathVariable UUID id) {
+    public ResponseEntity<?> getImage(@PathVariable UUID id) {
         Image image = imageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Image not found for id: " + id));
         String contentType = URLConnection.guessContentTypeFromName(image.fileName());
         return ResponseEntity.ok()

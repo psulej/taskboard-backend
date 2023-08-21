@@ -1,11 +1,9 @@
 package dev.psulej.taskboard.user.service;
-
 import dev.psulej.taskboard.user.api.UserContext;
 import dev.psulej.taskboard.user.domain.User;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -26,6 +24,5 @@ public class UserContextService {
                 .name(user.name())
                 .imageId(user.imageId())
                 .build();
-
     }
 }
