@@ -1,5 +1,4 @@
 package dev.psulej.taskboard.user.controller;
-import dev.psulej.taskboard.image.domain.Image;
 import dev.psulej.taskboard.user.domain.UserSettings;
 import dev.psulej.taskboard.user.service.UserSettingsService;
 import lombok.AllArgsConstructor;
@@ -28,5 +27,10 @@ public class UserSettingsController {
         } catch (Exception e) {
             return new ResponseEntity<>("Settings save failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping
+    public UserSettings getUserSettings() {
+        return userSettingsService.getUserSettings();
     }
 }

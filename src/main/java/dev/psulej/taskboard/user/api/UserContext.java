@@ -9,6 +9,7 @@ public record UserContext(
         String email,
         String name,
         UUID imageId,
-        ApplicationTheme theme
+        String theme,
+        String avatarColor
 ) {
 }

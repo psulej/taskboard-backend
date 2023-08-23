@@ -23,7 +23,7 @@ public class ImageController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getImage(@PathVariable UUID id) {
-        Image image = imageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Image not found for id: " + id));
+        Image image = imageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Image not found for userId: " + id));
         String contentType = URLConnection.guessContentTypeFromName(image.fileName());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, contentType)

@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,13 +43,14 @@ public class UserSettingsService {
 
     private void updateUserSettings(String theme, String avatarColor) {
         UUID loggedUserId = userService.getLoggedUser().id();
-        userSettingsRepository.save(
-                UserSettings.builder()
-                        .id(loggedUserId)
+
+        userSettingsRepository.findByUserId(loggedUserId)
+                .map(userSettings -> userSettings.toBuilder()
                         .theme(theme)
                         .avatarColor(avatarColor)
                         .build()
-        );
+                )
+                .ifPresent(userSettingsRepository::save);
     }
 
     private Image persistImage(MultipartFile file, String fileName) throws IOException {
@@ -76,5 +76,10 @@ public class UserSettingsService {
                 .imageId(image.id())
                 .build();
         userRepository.save(updatedUser);
+    }
+
+    public UserSettings getUserSettings() {
+        UUID loggedUserId = userService.getLoggedUser().id();
+        return userSettingsRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("Logged user not found!"));
     }
 }
