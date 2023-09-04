@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Document("columns")
-@Builder
+@Builder(toBuilder = true)
 public record Column(
         @Id
         UUID id,

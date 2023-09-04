@@ -1,5 +1,6 @@
 package dev.psulej.taskboard.user.repository;
 import dev.psulej.taskboard.user.domain.User;
+import dev.psulej.taskboard.user.domain.UserSettings;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,5 +19,4 @@ public interface UserRepository extends MongoRepository<User, UUID> {
 
     @Query("{ $and: [{_id:  {$nin:  ?0} }, { login: { $regex: ?1, $options: 'i'}} ]}")
     List<User> findByIdNotInAAndLoginStartsWith(Iterable<UUID> users, String loginPhraseRegex);
-
 }

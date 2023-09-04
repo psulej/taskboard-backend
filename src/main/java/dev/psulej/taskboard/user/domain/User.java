@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.UUID;
 
 @Document("users")
-@Builder
+@Builder(toBuilder = true)
 public record  User(
         @Id UUID id,
 
@@ -24,7 +24,9 @@ public record  User(
         @JsonIgnore
         String password,
 
-        @Field UUID imageId
+        @Field UUID imageId,
+
+        @Field String avatarColor
 ) {
 }
 

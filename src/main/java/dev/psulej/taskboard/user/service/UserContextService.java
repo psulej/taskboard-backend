@@ -29,7 +29,7 @@ public class UserContextService {
                 .name(user.name())
                 .imageId(user.imageId())
                 .theme(userSettings.theme())
-                .avatarColor(userSettings.avatarColor())
+                .avatarColor(user.avatarColor())
                 .build();
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.UUID;
 
 @Document("tasks")
-@Builder
+@Builder(toBuilder = true)
 public record Task(
         @Id
         UUID id,

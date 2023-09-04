@@ -16,7 +16,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Random;
@@ -61,12 +60,12 @@ public class UserService {
                 .email(registerRequest.email())
                 .role(UserRole.USER)
                 .imageId(null)
+                .avatarColor(getRandomAvatarColor())
                 .build();
 
         UserSettings userSettings = UserSettings.builder()
                 .userId(registeredUserUUID)
                 .theme("dark")
-                .avatarColor(getRandomAvatarColor())
                 .build();
 
         userSettingsRepository.save(userSettings);

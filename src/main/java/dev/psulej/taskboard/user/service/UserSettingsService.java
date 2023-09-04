@@ -47,10 +47,16 @@ public class UserSettingsService {
         userSettingsRepository.findByUserId(loggedUserId)
                 .map(userSettings -> userSettings.toBuilder()
                         .theme(theme)
-                        .avatarColor(avatarColor)
                         .build()
                 )
                 .ifPresent(userSettingsRepository::save);
+
+        userRepository.findById(loggedUserId)
+                .map(user -> user.toBuilder()
+                        .avatarColor(avatarColor)
+                        .build()
+                )
+                .ifPresent(userRepository::save);
     }
 
     private Image persistImage(MultipartFile file, String fileName) throws IOException {
@@ -74,6 +80,7 @@ public class UserSettingsService {
                 .role(user.role())
                 .password(user.password())
                 .imageId(image.id())
+                .avatarColor(user.avatarColor())
                 .build();
         userRepository.save(updatedUser);
     }

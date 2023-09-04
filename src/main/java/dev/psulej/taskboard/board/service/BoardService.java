@@ -4,12 +4,15 @@ import dev.psulej.taskboard.board.api.AvailableBoard;
 import dev.psulej.taskboard.board.api.CreateBoard;
 import dev.psulej.taskboard.board.api.UpdateBoard;
 import dev.psulej.taskboard.board.domain.Board;
+import dev.psulej.taskboard.board.domain.Column;
+import dev.psulej.taskboard.board.domain.Task;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
 import dev.psulej.taskboard.user.domain.User;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -57,6 +60,9 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
+    @Autowired
+    private TaskRepository taskRepository;
+
     public Board editBoard(UUID boardId, UpdateBoard updateBoard) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
         List<UUID> updatedBoardIds = updateBoard.userIds();
@@ -66,6 +72,15 @@ public class BoardService {
         if(!updatedBoardUsers.contains(loggedUser)) {
             throw new IllegalArgumentException("Logged in user can not be deleted!");
         }
+
+        List<UUID> boardUsersIds = updateBoard.userIds();
+        List<Task> tasksToUpdate = board.columns().stream()
+                .flatMap(column -> column.tasks().stream())
+                .filter(task -> task.assignedUser() != null)
+                .filter(task -> !boardUsersIds.contains(task.assignedUser().id()))
+                .map(task -> task.toBuilder().assignedUser(null).build())
+                .toList();
+        taskRepository.saveAll(tasksToUpdate);
 
         Board newBoard = Board.builder()
                 .id(boardId)
