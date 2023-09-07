@@ -33,4 +33,7 @@ public class UserSettingsController {
     public UserSettings getUserSettings() {
         return userSettingsService.getUserSettings();
     }
+
+    @DeleteMapping("/avatar")
+    public void deleteUserAvatar() {userSettingsService.deleteUserAvatar();}
 }

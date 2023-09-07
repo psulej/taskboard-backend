@@ -4,7 +4,6 @@ import dev.psulej.taskboard.board.api.AvailableBoard;
 import dev.psulej.taskboard.board.api.CreateBoard;
 import dev.psulej.taskboard.board.api.UpdateBoard;
 import dev.psulej.taskboard.board.domain.Board;
-import dev.psulej.taskboard.board.domain.Column;
 import dev.psulej.taskboard.board.domain.Task;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;

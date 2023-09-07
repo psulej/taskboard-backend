@@ -38,6 +38,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                             .name("Anna")
                             .email("asmith@yahoo.com")
                             .role(UserRole.USER)
+                            .imageId(null)
+                            .avatarColor("#B80000")
                             .build()
             );
 

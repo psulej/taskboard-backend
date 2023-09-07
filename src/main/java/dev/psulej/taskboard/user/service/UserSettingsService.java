@@ -89,4 +89,20 @@ public class UserSettingsService {
         UUID loggedUserId = userService.getLoggedUser().id();
         return userSettingsRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("Logged user not found!"));
     }
+
+    public void deleteUserAvatar() {
+        UUID loggedUserId = userService.getLoggedUser().id();
+        User user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        User updatedUser = User.builder()
+                .id(user.id())
+                .login(user.login())
+                .email(user.email())
+                .name(user.name())
+                .role(user.role())
+                .password(user.password())
+                .imageId(null)
+                .avatarColor(user.avatarColor())
+                .build();
+        userRepository.save(updatedUser);
+    }
 }
