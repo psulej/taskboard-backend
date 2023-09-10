@@ -26,10 +26,10 @@ public class CommentService {
 
     public void addComment(UUID taskId, NewComment newComment) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
-        UUID loggedUserId = userService.getLoggedUser().id();
+        User loggedUser = userService.getLoggedUser();
 
         Comment comment = Comment.builder()
-                .userId(loggedUserId)
+                .user(loggedUser)
                 .description(newComment.description())
                 .id(UUID.randomUUID())
                 .createdAt(Instant.now())
@@ -57,4 +57,7 @@ public class CommentService {
         );
     }
 
+    public void deleteComment(UUID taskId) {
+//        Comment comment = commentRepository.findById()
+    }
 }

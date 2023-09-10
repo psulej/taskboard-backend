@@ -21,4 +21,9 @@ public class CommentController {
     public void addComment(@PathVariable UUID taskId, @Valid @RequestBody NewComment newComment) {
         commentService.addComment(taskId, newComment);
     }
+
+    @DeleteMapping("{taskId}")
+    public void deleteComment(@PathVariable UUID taskId) {
+        commentService.deleteComment(taskId);
+    }
 }

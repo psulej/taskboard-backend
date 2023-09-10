@@ -1,5 +1,4 @@
 package dev.psulej.taskboard.init;
-
 import dev.psulej.taskboard.board.domain.Board;
 import dev.psulej.taskboard.board.domain.Column;
 import dev.psulej.taskboard.board.domain.Task;
@@ -8,12 +7,13 @@ import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
 import dev.psulej.taskboard.user.domain.User;
 import dev.psulej.taskboard.user.domain.UserRole;
+import dev.psulej.taskboard.user.domain.UserSettings;
 import dev.psulej.taskboard.user.repository.UserRepository;
+import dev.psulej.taskboard.user.repository.UserSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +23,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final UserSettingsRepository userSettingsRepository;
     private final TaskRepository taskRepository;
     private final ColumnRepository columnRepository;
     private final PasswordEncoder passwordEncoder;
@@ -44,6 +45,15 @@ public class DatabaseInitializer implements CommandLineRunner {
             );
 
             userRepository.saveAll(users);
+
+
+            UserSettings userSettings = UserSettings.builder()
+                    .userId(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
+                    .theme("dark")
+                    .build();
+
+            userSettingsRepository.save(userSettings);
+
 
             List<Task> column1Tasks = List.of(
                     Task.builder()

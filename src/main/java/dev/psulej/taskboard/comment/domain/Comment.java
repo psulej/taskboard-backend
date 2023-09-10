@@ -1,11 +1,10 @@
 package dev.psulej.taskboard.comment.domain;
-
+import dev.psulej.taskboard.user.domain.User;
 import lombok.Builder;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,8 +18,8 @@ public record Comment(
         @Field
         String description,
 
-        @Field
-        UUID userId,
+        @DBRef
+        User user,
 
         @Field
         Instant createdAt
