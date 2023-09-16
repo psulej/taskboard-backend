@@ -1,16 +1,18 @@
 package dev.psulej.taskboard.board.domain;
 
+import dev.psulej.taskboard.user.domain.UserEntity;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.util.List;
 import java.util.UUID;
 
-@Document("columns")
-@Builder(toBuilder = true)
-public record Column(
+@Document("boards")
+@Builder
+public record BoardEntity(
         @Id
         UUID id,
 
@@ -18,7 +20,9 @@ public record Column(
         String name,
 
         @DBRef
-        List<Task> tasks
+        List<UserEntity> users,
+
+        @DBRef
+        List<ColumnEntity> columns
 ) {
 }
-

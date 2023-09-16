@@ -4,9 +4,9 @@ import dev.psulej.taskboard.security.ApplicationUserDetails;
 import dev.psulej.taskboard.security.TokenProvider;
 import dev.psulej.taskboard.user.domain.UserRole;
 import dev.psulej.taskboard.user.api.RegisterRequest;
-import dev.psulej.taskboard.user.domain.UserSettings;
+import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.repository.UserRepository;
-import dev.psulej.taskboard.user.domain.User;
+import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.repository.UserSettingsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +31,7 @@ public class UserService {
     private final UserValidator userValidator;
     private final UserSettingsRepository userSettingsRepository;
 
-    public User getLoggedUser() {
+    public UserEntity getLoggedUser() {
         String login = Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getPrincipal)
@@ -43,7 +43,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
-    public Optional<User> findUserByLogin(String login) {
+    public Optional<UserEntity> findUserByLogin(String login) {
         return userRepository.findByLoginIgnoreCase(login);
     }
 
@@ -52,7 +52,7 @@ public class UserService {
 
         UUID registeredUserUUID = UUID.randomUUID();
 
-        User registerUser = User.builder()
+        UserEntity registerUser = UserEntity.builder()
                 .id(registeredUserUUID)
                 .login(registerRequest.login())
                 .password(passwordEncoder.encode(registerRequest.password()))
@@ -63,7 +63,7 @@ public class UserService {
                 .avatarColor(getRandomAvatarColor())
                 .build();
 
-        UserSettings userSettings = UserSettings.builder()
+        UserSettingsEntity userSettings = UserSettingsEntity.builder()
                 .userId(registeredUserUUID)
                 .theme("dark")
                 .build();

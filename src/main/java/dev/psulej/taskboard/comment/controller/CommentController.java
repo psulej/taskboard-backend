@@ -1,7 +1,6 @@
 package dev.psulej.taskboard.comment.controller;
 
 import dev.psulej.taskboard.comment.api.NewComment;
-import dev.psulej.taskboard.comment.domain.Comment;
 import dev.psulej.taskboard.comment.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,8 +21,8 @@ public class CommentController {
         commentService.addComment(taskId, newComment);
     }
 
-    @DeleteMapping("{taskId}")
-    public void deleteComment(@PathVariable UUID taskId) {
-        commentService.deleteComment(taskId);
+    @DeleteMapping("{commentId}")
+    public void deleteComment(@PathVariable UUID commentId) {
+        commentService.deleteComment(commentId);
     }
 }

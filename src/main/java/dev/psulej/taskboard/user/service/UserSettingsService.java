@@ -2,8 +2,8 @@ package dev.psulej.taskboard.user.service;
 
 import dev.psulej.taskboard.image.domain.Image;
 import dev.psulej.taskboard.image.repository.ImageRepository;
-import dev.psulej.taskboard.user.domain.User;
-import dev.psulej.taskboard.user.domain.UserSettings;
+import dev.psulej.taskboard.user.domain.UserEntity;
+import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.repository.UserSettingsRepository;
 import lombok.AllArgsConstructor;
@@ -71,8 +71,8 @@ public class UserSettingsService {
 
     private void updateUserImage(Image image) {
         UUID loggedUserId = userService.getLoggedUser().id();
-        User user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
-        User updatedUser = User.builder()
+        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        UserEntity updatedUser = UserEntity.builder()
                 .id(user.id())
                 .login(user.login())
                 .email(user.email())
@@ -85,15 +85,15 @@ public class UserSettingsService {
         userRepository.save(updatedUser);
     }
 
-    public UserSettings getUserSettings() {
+    public UserSettingsEntity getUserSettings() {
         UUID loggedUserId = userService.getLoggedUser().id();
         return userSettingsRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("Logged user not found!"));
     }
 
     public void deleteUserAvatar() {
         UUID loggedUserId = userService.getLoggedUser().id();
-        User user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
-        User updatedUser = User.builder()
+        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        UserEntity updatedUser = UserEntity.builder()
                 .id(user.id())
                 .login(user.login())
                 .email(user.email())

@@ -1,5 +1,5 @@
 package dev.psulej.taskboard.comment.domain;
-import dev.psulej.taskboard.user.domain.User;
+import dev.psulej.taskboard.user.domain.UserEntity;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Document("comments")
 @Builder
-public record Comment(
+public record CommentEntity(
 
         @Id
         UUID id,
@@ -19,7 +19,7 @@ public record Comment(
         String description,
 
         @DBRef
-        User user,
+        UserEntity user,
 
         @Field
         Instant createdAt

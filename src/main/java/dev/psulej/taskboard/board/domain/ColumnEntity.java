@@ -1,32 +1,24 @@
 package dev.psulej.taskboard.board.domain;
 
-import dev.psulej.taskboard.comment.domain.Comment;
-import dev.psulej.taskboard.user.domain.User;
-import lombok.*;
+import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
 import java.util.List;
 import java.util.UUID;
 
-@Document("tasks")
+@Document("columns")
 @Builder(toBuilder = true)
-public record Task(
+public record ColumnEntity(
         @Id
         UUID id,
 
         @Field
-        String title,
-
-        @Field
-        String description,
+        String name,
 
         @DBRef
-        User assignedUser,
-
-        @DBRef
-        List<Comment> comments
+        List<TaskEntity> tasks
 ) {
 }
+

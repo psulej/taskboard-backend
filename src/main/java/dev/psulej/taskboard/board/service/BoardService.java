@@ -1,17 +1,15 @@
 package dev.psulej.taskboard.board.service;
 
-import dev.psulej.taskboard.board.api.AvailableBoard;
-import dev.psulej.taskboard.board.api.CreateBoard;
-import dev.psulej.taskboard.board.api.UpdateBoard;
-import dev.psulej.taskboard.board.domain.Board;
-import dev.psulej.taskboard.board.domain.Task;
+import dev.psulej.taskboard.board.api.*;
+import dev.psulej.taskboard.board.domain.BoardEntity;
+import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.mapper.BoardMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
-import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
-import dev.psulej.taskboard.user.domain.User;
+import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,22 +19,20 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 @Service
+@RequiredArgsConstructor
 public class BoardService {
     private final MongoTemplate mongoTemplate;
     private final BoardRepository boardRepository;
+    private final BoardMapper boardMapper;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
     private final UserService userService;
 
-    public BoardService(MongoTemplate mongoTemplate, BoardRepository boardRepository, ColumnRepository columnRepository, TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
-        this.mongoTemplate = mongoTemplate;
-        this.boardRepository = boardRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
 
     public List<AvailableBoard> getAvailableBoards() {
-        User loggedUser = userService.getLoggedUser();
+        UserEntity loggedUser = userService.getLoggedUser();
         Query query = new Query();
         Criteria criteria = Criteria.where("users.$id").in(loggedUser.id());
         query.addCriteria(criteria);
@@ -45,35 +41,34 @@ public class BoardService {
 
     public Board getBoard(UUID boardId) {
         return boardRepository.findById(boardId)
+                .map(boardMapper::mapBoard)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
     }
 
     public Board addBoard(CreateBoard createBoard) {
-        User loggedUser = userService.getLoggedUser();
-        Board board = Board.builder()
+        UserEntity loggedUser = userService.getLoggedUser();
+        BoardEntity boardEntity = boardRepository.save(BoardEntity.builder()
                 .id(UUID.randomUUID())
                 .name(createBoard.name())
                 .users(List.of(loggedUser))
                 .columns(List.of())
-                .build();
-        return boardRepository.save(board);
+                .build());
+
+        return boardMapper.mapBoard(boardEntity);
     }
 
-    @Autowired
-    private TaskRepository taskRepository;
-
     public Board editBoard(UUID boardId, UpdateBoard updateBoard) {
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
         List<UUID> updatedBoardIds = updateBoard.userIds();
-        List<User> updatedBoardUsers = userRepository.findAllById(updatedBoardIds);
+        List<UserEntity> updatedBoardUsers = userRepository.findAllById(updatedBoardIds);
 
-        User loggedUser = userService.getLoggedUser();
-        if(!updatedBoardUsers.contains(loggedUser)) {
+        UserEntity loggedUser = userService.getLoggedUser();
+        if (!updatedBoardUsers.contains(loggedUser)) {
             throw new IllegalArgumentException("Logged in user can not be deleted!");
         }
 
         List<UUID> boardUsersIds = updateBoard.userIds();
-        List<Task> tasksToUpdate = board.columns().stream()
+        List<TaskEntity> tasksToUpdate = board.columns().stream()
                 .flatMap(column -> column.tasks().stream())
                 .filter(task -> task.assignedUser() != null)
                 .filter(task -> !boardUsersIds.contains(task.assignedUser().id()))
@@ -81,24 +76,25 @@ public class BoardService {
                 .toList();
         taskRepository.saveAll(tasksToUpdate);
 
-        Board newBoard = Board.builder()
+        BoardEntity boardEntity = boardRepository.save(BoardEntity.builder()
                 .id(boardId)
                 .name(updateBoard.name())
                 .users(updatedBoardUsers)
                 .columns(board.columns())
-                .build();
-        return boardRepository.save(newBoard);
+                .build());
+
+        return boardMapper.mapBoard(boardEntity);
     }
 
     public void deleteBoard(UUID boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
         boardRepository.deleteById(boardId);
     }
 
-    public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
-        Board board = boardRepository.findById(boardId)
+    public List<UserEntity> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
+        BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found"));
-        List<UUID> boardUserIds = board.users().stream().map(User::id).toList();
+        List<UUID> boardUserIds = board.users().stream().map(UserEntity::id).toList();
 
         Set<UUID> allExcludedUserIds = Stream.of(boardUserIds, excludedUserIds)
                 .filter(Objects::nonNull)

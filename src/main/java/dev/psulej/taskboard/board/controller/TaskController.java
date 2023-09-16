@@ -1,22 +1,18 @@
 package dev.psulej.taskboard.board.controller;
-
 import dev.psulej.taskboard.board.api.CreateTask;
+import dev.psulej.taskboard.board.api.Task;
 import dev.psulej.taskboard.board.api.UpdateTask;
-import dev.psulej.taskboard.board.domain.Task;
 import dev.psulej.taskboard.board.service.TaskService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/boards")
+@RequiredArgsConstructor
 public class TaskController {
-    TaskService taskService;
-
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
+    private final TaskService taskService;
 
     @PostMapping("/{boardId}/columns/{columnId}/tasks")
     public Task addTask(

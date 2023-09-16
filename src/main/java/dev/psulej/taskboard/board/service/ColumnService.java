@@ -1,13 +1,16 @@
 package dev.psulej.taskboard.board.service;
 
+import dev.psulej.taskboard.board.api.Column;
 import dev.psulej.taskboard.board.api.CreateColumn;
 import dev.psulej.taskboard.board.api.UpdateColumn;
 import dev.psulej.taskboard.board.api.UpdateColumnTasks;
-import dev.psulej.taskboard.board.domain.Board;
-import dev.psulej.taskboard.board.domain.Column;
-import dev.psulej.taskboard.board.domain.Task;
+import dev.psulej.taskboard.board.domain.BoardEntity;
+import dev.psulej.taskboard.board.domain.ColumnEntity;
+import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.mapper.ColumnMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,53 +18,44 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ColumnService {
-    ColumnRepository columnRepository;
-    BoardRepository boardRepository;
-
-    public ColumnService(ColumnRepository columnRepository, BoardRepository boardRepository) {
-        this.columnRepository = columnRepository;
-        this.boardRepository = boardRepository;
-    }
+    private final ColumnRepository columnRepository;
+    private final BoardRepository boardRepository;
+    private final ColumnMapper columnMapper;
 
     public void updateColumns(UUID boardId, List<UpdateColumnTasks> updatedColumns) {
-        Board board = boardRepository.findById(boardId)
+        BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
-        Map<UUID, List<Task>> taskCount = board.columns().stream()
-                .map(Column::tasks)
-                .flatMap(Collection::stream)
-                .collect(Collectors.groupingBy(
-                        Task::id
-                ));
-        Map<UUID, Task> tasksById = board.columns().stream()
-                .map(Column::tasks)
+        Map<UUID, TaskEntity> tasksById = board.columns().stream()
+                .map(ColumnEntity::tasks)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(
-                        Task::id,
+                        TaskEntity::id,
                         Function.identity()
                 ));
-        Map<UUID, Column> columnsById = board.columns().stream().collect(Collectors.toMap(
-                Column::id,
+        Map<UUID, ColumnEntity> columnsById = board.columns().stream().collect(Collectors.toMap(
+                ColumnEntity::id,
                 Function.identity()
         ));
-        List<Column> newColumns = new ArrayList<>();
+        List<ColumnEntity> newColumns = new ArrayList<>();
         updatedColumns.forEach(updatedColumn -> {
             UUID columnId = updatedColumn.columnId();
-            Column column = columnsById.get(columnId);
+            ColumnEntity column = columnsById.get(columnId);
             if (column == null) {
                 throw new IllegalStateException("Column with columnId " + columnId + " was not found in the board " + boardId);
             }
-            List<Task> newTasks = new ArrayList<>();
+            List<TaskEntity> newTasks = new ArrayList<>();
             updatedColumn.taskIds().forEach(taskId -> {
                 // pobranie nowego taska
-                Task task = tasksById.get(taskId);
+                TaskEntity task = tasksById.get(taskId);
                 if (task == null) {
                     throw new IllegalStateException("Task with id " + taskId + " was not found in the column " + columnId);
                 }
                 newTasks.add(task);
             });
 
-            Column newColumn = Column.builder()
+            ColumnEntity newColumn = ColumnEntity.builder()
                     .id(column.id())
                     .name(column.name())
                     .tasks(newTasks)
@@ -71,7 +65,7 @@ public class ColumnService {
             newColumns.add(newColumn);
         });
 
-        Board newBoard = Board.builder()
+        BoardEntity newBoard = BoardEntity.builder()
                 .id(board.id())
                 .name(board.name())
                 .users(board.users())
@@ -83,47 +77,45 @@ public class ColumnService {
     }
 
     public Column addColumn(UUID boardId, CreateColumn createColumn) {
-        Board board = boardRepository.findById(boardId)
+        BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
-        Column column = Column.builder()
+        ColumnEntity column = ColumnEntity.builder()
                 .id(UUID.randomUUID())
                 .name(createColumn.title())
                 .tasks(List.of())
                 .build();
         columnRepository.save(column);
-        List<Column> oldColumns = board.columns();
-        List<Column> newColumns = new ArrayList<>(oldColumns);
+        List<ColumnEntity> oldColumns = board.columns();
+        List<ColumnEntity> newColumns = new ArrayList<>(oldColumns);
         newColumns.add(column);
-        Board newBoard = Board.builder()
+        boardRepository.save(BoardEntity.builder()
                 .id(boardId)
                 .name(board.name())
                 .users(board.users())
                 .columns(newColumns)
-                .build();
-        boardRepository.save(newBoard);
-        return column;
+                .build());
+        return columnMapper.mapColumn(column);
     }
 
     public Column editColumn(UUID boardId, UUID columnId, UpdateColumn updateColumn) {
-        if (!boardRepository.existsById(boardId)) {
-            throw new IllegalArgumentException("Board not found");
-        }
-        return columnRepository.findById(columnId)
-                .map(column -> Column.builder()
+        if (!boardRepository.existsById(boardId)) throw new IllegalArgumentException("Board not found");
+        ColumnEntity columnEntity = columnRepository.findById(columnId)
+                .map(column -> ColumnEntity.builder()
                         .id(column.id())
                         .name(updateColumn.title())
                         .tasks(column.tasks())
                         .build())
                 .map(columnRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
+        return columnMapper.mapColumn(columnEntity);
     }
 
     public void deleteColumn(UUID boardId, UUID columnId) {
-        Board board = boardRepository.findById(boardId)
+        BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
-        List<Column> oldColumnList = board.columns();
-        List<Column> newColumnList = oldColumnList.stream().filter(column -> !column.id().equals(columnId)).toList();
-        Board newBoard = Board.builder()
+        List<ColumnEntity> oldColumnList = board.columns();
+        List<ColumnEntity> newColumnList = oldColumnList.stream().filter(column -> !column.id().equals(columnId)).toList();
+        BoardEntity newBoard = BoardEntity.builder()
                 .id(board.id())
                 .name(board.name())
                 .users(board.users())
@@ -132,6 +124,4 @@ public class ColumnService {
         boardRepository.save(newBoard);
         columnRepository.deleteById(columnId);
     }
-
-
 }

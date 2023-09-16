@@ -1,5 +1,4 @@
 package dev.psulej.taskboard.config;
-
 import dev.psulej.taskboard.security.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

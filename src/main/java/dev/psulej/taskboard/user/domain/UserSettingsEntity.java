@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Document(collection = "user-settings")
 @Builder(toBuilder = true)
-public record UserSettings(
+public record UserSettingsEntity(
         @Id UUID userId,
         @Field String theme,
         @Field String avatarColor

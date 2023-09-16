@@ -1,5 +1,5 @@
 package dev.psulej.taskboard.user.controller;
-import dev.psulej.taskboard.user.domain.UserSettings;
+import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.service.UserSettingsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class UserSettingsController {
     }
 
     @GetMapping
-    public UserSettings getUserSettings() {
+    public UserSettingsEntity getUserSettings() {
         return userSettingsService.getUserSettings();
     }
 

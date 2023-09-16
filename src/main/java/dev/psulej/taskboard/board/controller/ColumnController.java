@@ -1,23 +1,21 @@
 package dev.psulej.taskboard.board.controller;
 
+import dev.psulej.taskboard.board.api.Column;
 import dev.psulej.taskboard.board.api.CreateColumn;
 import dev.psulej.taskboard.board.api.UpdateColumn;
 import dev.psulej.taskboard.board.api.UpdateColumnTasks;
-import dev.psulej.taskboard.board.domain.Column;
 import dev.psulej.taskboard.board.service.ColumnService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 @RestController
 @RequestMapping("/boards")
+@RequiredArgsConstructor
 public class ColumnController {
 
-    ColumnService columnService;
-
-    public ColumnController(ColumnService columnService) {
-        this.columnService = columnService;
-    }
+    private final ColumnService columnService;
 
     @PostMapping("/{boardId}/columns")
     public Column addColumn(
