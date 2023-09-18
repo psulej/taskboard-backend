@@ -4,8 +4,10 @@ import dev.psulej.taskboard.board.api.*;
 import dev.psulej.taskboard.board.domain.BoardEntity;
 import dev.psulej.taskboard.board.domain.TaskEntity;
 import dev.psulej.taskboard.board.mapper.BoardMapper;
+import dev.psulej.taskboard.board.mapper.UserMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
+import dev.psulej.taskboard.user.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.service.UserService;
@@ -29,6 +31,7 @@ public class BoardService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final UserMapper userMapper;
 
 
     public List<AvailableBoard> getAvailableBoards() {
@@ -91,7 +94,7 @@ public class BoardService {
         boardRepository.deleteById(boardId);
     }
 
-    public List<UserEntity> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
+    public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
         BoardEntity board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("Board not found"));
         List<UUID> boardUserIds = board.users().stream().map(UserEntity::id).toList();
@@ -103,9 +106,15 @@ public class BoardService {
 
         if (StringUtils.hasText(loginPhrase)) {
             String loginPhraseRegex = "^" + loginPhrase + ".*";
-            return userRepository.findByIdNotInAAndLoginStartsWith(allExcludedUserIds, loginPhraseRegex);
+            List<UserEntity> usersByIdNotInAAndLoginStartsWith = userRepository.findByIdNotInAAndLoginStartsWith(allExcludedUserIds, loginPhraseRegex);
+            return getUsersIds(usersByIdNotInAAndLoginStartsWith);
         } else {
-            return userRepository.findByIdNotIn(allExcludedUserIds);
+            List<UserEntity> usersByIdNotIn = userRepository.findByIdNotIn(allExcludedUserIds);
+            return getUsersIds(usersByIdNotIn);
         }
+    }
+
+    private List<User> getUsersIds(List<UserEntity> usersIds) {
+        return usersIds.stream().map(userMapper::mapUser).toList();
     }
 }

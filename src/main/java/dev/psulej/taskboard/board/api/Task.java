@@ -1,6 +1,6 @@
 package dev.psulej.taskboard.board.api;
 import dev.psulej.taskboard.comment.api.Comment;
-import dev.psulej.taskboard.user.api.UserView;
+import dev.psulej.taskboard.user.api.User;
 import lombok.Builder;
 
 
@@ -12,7 +12,7 @@ public record Task(
         UUID id,
         String title,
         String description,
-        UserView assignedUser,
+        User assignedUser,
         List<Comment> comments
 ) {
 }

@@ -5,6 +5,7 @@ import dev.psulej.taskboard.board.api.Board;
 import dev.psulej.taskboard.board.api.CreateBoard;
 import dev.psulej.taskboard.board.api.UpdateBoard;
 import dev.psulej.taskboard.board.service.BoardService;
+import dev.psulej.taskboard.user.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}/assignable-users")
-    public List<UserEntity> getAssignableUsers(
+    public List<User> getAssignableUsers(
             @PathVariable UUID boardId,
             @RequestParam(required = false) String loginPhrase,
             @RequestParam(required = false) List<UUID> excludedUserIds

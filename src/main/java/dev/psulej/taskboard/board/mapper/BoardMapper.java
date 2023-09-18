@@ -3,8 +3,6 @@ import dev.psulej.taskboard.board.api.Board;
 import dev.psulej.taskboard.board.api.Column;
 
 import dev.psulej.taskboard.board.domain.BoardEntity;
-import dev.psulej.taskboard.user.api.UserView;
-import dev.psulej.taskboard.user.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -16,6 +14,7 @@ import java.util.List;
 public class BoardMapper {
 
     private final ColumnMapper columnMapper;
+    private final UserMapper userMapper;
 
     public Board mapBoard(BoardEntity board) {
 
@@ -23,7 +22,7 @@ public class BoardMapper {
                 .id(board.id())
                 .name(board.name())
                 .users(CollectionUtils.emptyIfNull(board.users()).stream()
-                        .map(this::mapUser)
+                        .map(userMapper::mapUser)
                         .toList())
                 .columns(mapColumns(board))
                 .build();
@@ -35,15 +34,4 @@ public class BoardMapper {
                 .toList();
     }
 
-
-
-    private UserView mapUser(UserEntity user) {
-        return UserView.builder()
-                .id(user.id())
-                .login(user.login())
-                .name(user.name())
-                .imageId(user.imageId())
-                .avatarColor(user.avatarColor())
-                .build();
-    }
 }

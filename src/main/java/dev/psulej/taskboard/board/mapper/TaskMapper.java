@@ -19,7 +19,7 @@ public class TaskMapper {
                 .description(task.description())
                 .assignedUser(task.assignedUser() != null ? userMapper.mapUser(task.assignedUser()) : null)
                 .comments(CollectionUtils.emptyIfNull(task.comments()).stream()
-                        .map(comment -> commentMapper.mapComment(task, comment))
+                        .map(commentMapper::mapComment)
                         .toList())
                 .build();
     }

@@ -1,6 +1,6 @@
 package dev.psulej.taskboard.board.api;
 
-import dev.psulej.taskboard.user.api.UserView;
+import dev.psulej.taskboard.user.api.User;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.UUID;
 public record Board(
         UUID id,
         String name,
-        List<UserView> users,
+        List<User> users,
         List<Column> columns
 ) {
 }

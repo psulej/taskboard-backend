@@ -1,8 +1,11 @@
 package dev.psulej.taskboard.comment.service;
 
 import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.mapper.CommentMapper;
 import dev.psulej.taskboard.board.repository.TaskRepository;
+import dev.psulej.taskboard.comment.api.Comment;
 import dev.psulej.taskboard.comment.api.NewComment;
+import dev.psulej.taskboard.comment.api.UpdateComment;
 import dev.psulej.taskboard.comment.domain.CommentEntity;
 import dev.psulej.taskboard.comment.repository.CommentRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
@@ -20,11 +23,12 @@ import java.util.UUID;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
     private final TaskRepository taskRepository;
     private final UserService userService;
 
-    public void addComment(UUID taskId, NewComment newComment) {
-        TaskEntity task = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+    public Comment addComment(UUID taskId, NewComment newComment) {
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
         UserEntity loggedUser = userService.getLoggedUser();
 
         CommentEntity comment = CommentEntity.builder()
@@ -34,7 +38,7 @@ public class CommentService {
                 .createdAt(Instant.now())
                 .build();
 
-        List<CommentEntity> oldCommentsList = task.comments();
+        List<CommentEntity> oldCommentsList = taskEntity.comments();
         List<CommentEntity> newCommentsList;
 
         if (oldCommentsList != null) {
@@ -47,17 +51,32 @@ public class CommentService {
         commentRepository.save(comment);
 
         taskRepository.save(TaskEntity.builder()
-                .id(task.id())
-                .title(task.title())
-                .description(task.description())
-                .assignedUser(task.assignedUser())
+                .id(taskEntity.id())
+                .title(taskEntity.title())
+                .description(taskEntity.description())
+                .assignedUser(taskEntity.assignedUser())
                 .comments(newCommentsList)
                 .build()
         );
+
+        return commentMapper.mapComment(comment);
     }
 
     public void deleteComment(UUID commentId) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
         commentRepository.deleteById(commentId);
+    }
+
+    public Comment editComment(UUID commentId, UpdateComment updateComment) {
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        CommentEntity updatedComment = CommentEntity.builder()
+                .user(comment.user())
+                .description(updateComment.description())
+                .id(comment.id())
+                .createdAt(Instant.now())
+                .build();
+
+        return commentMapper.mapComment(updatedComment);
     }
 }

@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record UserView(
+public record User(
         UUID id,
         String login,
         String name,

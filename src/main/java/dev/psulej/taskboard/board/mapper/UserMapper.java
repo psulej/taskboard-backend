@@ -1,12 +1,12 @@
 package dev.psulej.taskboard.board.mapper;
-import dev.psulej.taskboard.user.api.UserView;
+import dev.psulej.taskboard.user.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserView mapUser(UserEntity user) {
-        return UserView.builder()
+    public User mapUser(UserEntity user) {
+        return User.builder()
                 .id(user.id())
                 .login(user.login())
                 .name(user.name())
@@ -14,4 +14,5 @@ public class UserMapper {
                 .avatarColor(user.avatarColor())
                 .build();
     }
+
 }
