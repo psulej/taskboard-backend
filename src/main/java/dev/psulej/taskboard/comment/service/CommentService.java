@@ -4,7 +4,7 @@ import dev.psulej.taskboard.board.domain.TaskEntity;
 import dev.psulej.taskboard.board.mapper.CommentMapper;
 import dev.psulej.taskboard.board.repository.TaskRepository;
 import dev.psulej.taskboard.comment.api.Comment;
-import dev.psulej.taskboard.comment.api.NewComment;
+import dev.psulej.taskboard.comment.api.CreateComment;
 import dev.psulej.taskboard.comment.api.UpdateComment;
 import dev.psulej.taskboard.comment.domain.CommentEntity;
 import dev.psulej.taskboard.comment.repository.CommentRepository;
@@ -27,7 +27,7 @@ public class CommentService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
-    public Comment addComment(UUID taskId, NewComment newComment) {
+    public Comment addComment(UUID taskId, CreateComment newComment) {
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
         UserEntity loggedUser = userService.getLoggedUser();
 
@@ -76,6 +76,8 @@ public class CommentService {
                 .id(comment.id())
                 .createdAt(Instant.now())
                 .build();
+
+        commentRepository.save(updatedComment);
 
         return commentMapper.mapComment(updatedComment);
     }
