@@ -1,5 +1,5 @@
 package dev.psulej.taskboard.comment.api;
-import dev.psulej.taskboard.user.domain.UserEntity;
+import dev.psulej.taskboard.user.api.User;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -9,7 +9,8 @@ import java.util.UUID;
 public record Comment(
         UUID id,
         String description,
-        UserEntity user,
-        Instant createdAt
+        User user,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

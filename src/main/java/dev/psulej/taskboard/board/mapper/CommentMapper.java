@@ -10,12 +10,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CommentMapper {
 
+    private final UserMapper userMapper;
+
     public Comment mapComment(CommentEntity comment) {
         return Comment.builder()
                 .id(comment.id())
                 .createdAt(comment.createdAt())
+                .updatedAt(comment.updatedAt())
                 .description(comment.description())
-                .user(comment.user())
+                .user(userMapper.mapUser(comment.user()))
                 .build();
     }
 }

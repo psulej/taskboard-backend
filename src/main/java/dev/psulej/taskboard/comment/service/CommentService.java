@@ -11,6 +11,7 @@ import dev.psulej.taskboard.comment.repository.CommentRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.service.UserService;
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,6 +30,7 @@ public class CommentService {
 
     public Comment addComment(UUID taskId, CreateComment newComment) {
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
         UserEntity loggedUser = userService.getLoggedUser();
 
         CommentEntity comment = CommentEntity.builder()
@@ -68,17 +70,20 @@ public class CommentService {
     }
 
     public Comment editComment(UUID commentId, UpdateComment updateComment) {
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        return commentRepository.findById(commentId)
+                .map(comment -> comment.toBuilder()
+                        .description(updateComment.description())
+                        .updatedAt(Instant.now())
+                        .build()
+                )
+                .map(commentRepository::save)
+                .map(commentMapper::mapComment)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+    }
 
-        CommentEntity updatedComment = CommentEntity.builder()
-                .user(comment.user())
-                .description(updateComment.description())
-                .id(comment.id())
-                .createdAt(Instant.now())
-                .build();
-
-        commentRepository.save(updatedComment);
-
-        return commentMapper.mapComment(updatedComment);
+    public List<Comment> getComments(UUID taskId) {
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        List<CommentEntity> taskComments = (List<CommentEntity>) CollectionUtils.emptyIfNull(taskEntity.comments());
+        return taskComments.stream().map(commentMapper::mapComment).toList();
     }
 }

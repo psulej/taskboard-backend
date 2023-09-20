@@ -73,8 +73,7 @@ public class TaskService {
                                 .orElseThrow(() -> new IllegalArgumentException("User not found")))
                 .orElse(null);
         TaskEntity taskEntity = taskRepository.findById(taskId)
-                .map(task -> TaskEntity.builder()
-                        .id(task.id())
+                .map(task -> task.toBuilder()
                         .title(updateTask.title())
                         .description(updateTask.description())
                         .assignedUser(assignedUser)

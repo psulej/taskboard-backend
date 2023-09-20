@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Document("comments")
-@Builder
+@Builder(toBuilder = true)
 public record CommentEntity(
 
         @Id
@@ -22,6 +22,9 @@ public record CommentEntity(
         UserEntity user,
 
         @Field
-        Instant createdAt
+        Instant createdAt,
+
+        @Field
+        Instant updatedAt
 ) {
 }
