@@ -9,6 +9,7 @@ import dev.psulej.taskboard.comment.api.UpdateComment;
 import dev.psulej.taskboard.comment.domain.CommentEntity;
 import dev.psulej.taskboard.comment.repository.CommentRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
+import dev.psulej.taskboard.user.exception.UserHasNoPermissionException;
 import dev.psulej.taskboard.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,21 +65,28 @@ public class CommentService {
         return commentMapper.mapComment(comment);
     }
 
+    private CommentEntity checkUserCommentPermission(UUID commentId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment with id: "+ commentId +" not found"));
+        UserEntity loggedUser = userService.getLoggedUser();
+        if(loggedUser.id() != comment.user().id()) {
+            throw new UserHasNoPermissionException("User has not permission to modify comment with id: " + commentId);
+        }
+        return comment;
+    }
+
     public void deleteComment(UUID commentId) {
-        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        CommentEntity comment = checkUserCommentPermission(commentId);
         commentRepository.deleteById(commentId);
     }
 
     public Comment editComment(UUID commentId, UpdateComment updateComment) {
-        return commentRepository.findById(commentId)
-                .map(comment -> comment.toBuilder()
-                        .description(updateComment.description())
-                        .updatedAt(Instant.now())
-                        .build()
-                )
-                .map(commentRepository::save)
-                .map(commentMapper::mapComment)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        CommentEntity comment = checkUserCommentPermission(commentId);
+        CommentEntity updatedComment = comment.toBuilder()
+                .description(updateComment.description())
+                .updatedAt(Instant.now())
+                .build();
+        return commentMapper.mapComment(commentRepository.save(updatedComment));
     }
 
     public List<Comment> getComments(UUID taskId) {
