@@ -68,9 +68,10 @@ public class CommentService {
     private CommentEntity checkUserCommentPermission(UUID commentId) {
         CommentEntity comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment with id: "+ commentId +" not found"));
-        UserEntity loggedUser = userService.getLoggedUser();
-        if(loggedUser.id() != comment.user().id()) {
-            throw new UserHasNoPermissionException("User has not permission to modify comment with id: " + commentId);
+        UUID loggedUserId = userService.getLoggedUserId();
+        UUID commentUserId = comment.user().id();
+        if(!loggedUserId.equals(commentUserId)) {
+            throw new UserHasNoPermissionException("User has not permission to edit comment with id: " + commentId);
         }
         return comment;
     }

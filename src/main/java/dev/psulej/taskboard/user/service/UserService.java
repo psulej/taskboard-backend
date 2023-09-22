@@ -31,6 +31,16 @@ public class UserService {
     private final UserValidator userValidator;
     private final UserSettingsRepository userSettingsRepository;
 
+    public UUID getLoggedUserId() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal.getClass().isAssignableFrom(ApplicationUserDetails.class))
+                .map(principal -> (ApplicationUserDetails) principal)
+                .map(ApplicationUserDetails::getId)
+                .orElseThrow(() -> new IllegalStateException("User cannot be extracted"));
+    }
+
     public UserEntity getLoggedUser() {
         String login = Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
