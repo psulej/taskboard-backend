@@ -22,6 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TaskService {
+    private final BoardUpdatePublisher boardUpdatePublisher;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final ColumnRepository columnRepository;
@@ -47,6 +48,7 @@ public class TaskService {
                 .tasks(newTaskList)
                 .build();
         columnRepository.save(newColumn);
+        boardUpdatePublisher.publish(boardId);
         return taskMapper.mapTask(newTask);
     }
 
@@ -62,6 +64,7 @@ public class TaskService {
                 .build();
         columnRepository.save(newColumn);
         taskRepository.deleteById(taskId);
+        boardUpdatePublisher.publish(boardId);
     }
 
     public Task editTask(UUID boardId, UUID columnId, UUID taskId, UpdateTask updateTask) {
@@ -80,6 +83,7 @@ public class TaskService {
                         .build())
                 .map(taskRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        boardUpdatePublisher.publish(boardId);
         return taskMapper.mapTask(taskEntity);
     }
 }

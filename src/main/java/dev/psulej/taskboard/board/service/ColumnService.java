@@ -7,6 +7,7 @@ import dev.psulej.taskboard.board.api.UpdateColumnTasks;
 import dev.psulej.taskboard.board.domain.BoardEntity;
 import dev.psulej.taskboard.board.domain.ColumnEntity;
 import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.mapper.BoardMapper;
 import dev.psulej.taskboard.board.mapper.ColumnMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
@@ -20,8 +21,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ColumnService {
+    private final BoardUpdatePublisher boardUpdatePublisher;
     private final ColumnRepository columnRepository;
     private final BoardRepository boardRepository;
+    private final BoardMapper boardMapper;
     private final ColumnMapper columnMapper;
 
     public void updateColumns(UUID boardId, List<UpdateColumnTasks> updatedColumns) {
@@ -71,9 +74,8 @@ public class ColumnService {
                 .users(board.users())
                 .columns(newColumns)
                 .build();
-
         boardRepository.save(newBoard);
-        System.out.println("boardId: " + boardId);
+        boardUpdatePublisher.publish(newBoard);
     }
 
     public Column addColumn(UUID boardId, CreateColumn createColumn) {
@@ -88,12 +90,14 @@ public class ColumnService {
         List<ColumnEntity> oldColumns = board.columns();
         List<ColumnEntity> newColumns = new ArrayList<>(oldColumns);
         newColumns.add(column);
-        boardRepository.save(BoardEntity.builder()
+        BoardEntity boardEntity = BoardEntity.builder()
                 .id(boardId)
                 .name(board.name())
                 .users(board.users())
                 .columns(newColumns)
-                .build());
+                .build();
+        boardRepository.save(boardEntity);
+        boardUpdatePublisher.publish(boardEntity);
         return columnMapper.mapColumn(column);
     }
 
@@ -107,6 +111,7 @@ public class ColumnService {
                         .build())
                 .map(columnRepository::save)
                 .orElseThrow(() -> new IllegalArgumentException("Column not found"));
+        boardUpdatePublisher.publish(boardId);
         return columnMapper.mapColumn(columnEntity);
     }
 
@@ -123,5 +128,6 @@ public class ColumnService {
                 .build();
         boardRepository.save(newBoard);
         columnRepository.deleteById(columnId);
+        boardUpdatePublisher.publish(newBoard);
     }
 }
