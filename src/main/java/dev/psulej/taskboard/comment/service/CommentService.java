@@ -28,13 +28,13 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final TaskRepository taskRepository;
     private final UserService userService;
+    private final CommentCreatedPublisher commentCreatedPublisher;
 
     public Comment addComment(UUID taskId, CreateComment newComment) {
         TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("Task not found"));
-
         UserEntity loggedUser = userService.getLoggedUser();
 
-        CommentEntity comment = CommentEntity.builder()
+        CommentEntity commentEntity = CommentEntity.builder()
                 .user(loggedUser)
                 .description(newComment.description())
                 .id(UUID.randomUUID())
@@ -50,8 +50,8 @@ public class CommentService {
             newCommentsList = new ArrayList<>();
         }
 
-        newCommentsList.add(comment);
-        commentRepository.save(comment);
+        newCommentsList.add(commentEntity);
+        commentRepository.save(commentEntity);
 
         taskRepository.save(TaskEntity.builder()
                 .id(taskEntity.id())
@@ -62,7 +62,9 @@ public class CommentService {
                 .build()
         );
 
-        return commentMapper.mapComment(comment);
+        Comment comment = commentMapper.mapComment(commentEntity);
+        commentCreatedPublisher.publish(taskId, comment);
+        return comment;
     }
 
     private CommentEntity checkUserCommentPermission(UUID commentId) {

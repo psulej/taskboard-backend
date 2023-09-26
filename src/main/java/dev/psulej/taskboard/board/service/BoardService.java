@@ -32,6 +32,7 @@ public class BoardService {
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final UserMapper userMapper;
+    private final BoardUpdatePublisher boardUpdatePublisher;
 
 
     public List<AvailableBoard> getAvailableBoards() {
@@ -43,9 +44,9 @@ public class BoardService {
     }
 
     public Board getBoard(UUID boardId) {
-        return boardRepository.findById(boardId)
-                .map(boardMapper::mapBoard)
-                .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
+        BoardEntity boardEntity = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board was not found"));
+//        boardUpdatePublisher.publish();
+        return boardMapper.mapBoard(boardEntity);
     }
 
     public Board addBoard(CreateBoard createBoard) {
@@ -57,6 +58,7 @@ public class BoardService {
                 .columns(List.of())
                 .build());
 
+        boardUpdatePublisher.publish(boardEntity);
         return boardMapper.mapBoard(boardEntity);
     }
 
@@ -86,12 +88,14 @@ public class BoardService {
                 .columns(board.columns())
                 .build());
 
+        boardUpdatePublisher.publish(boardEntity);
         return boardMapper.mapBoard(boardEntity);
     }
 
     public void deleteBoard(UUID boardId) {
         BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
         boardRepository.deleteById(boardId);
+        boardUpdatePublisher.publish(board);
     }
 
     public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
