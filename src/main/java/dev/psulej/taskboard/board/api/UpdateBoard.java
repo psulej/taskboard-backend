@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record UpdateBoard(
         @NotBlank
-        @Size(min=1, max=17, message = "Board name edit is valid")
+        @Size(min=1, max=100, message = "Board name edit is valid")
         String name,
 
         List<UUID> userIds

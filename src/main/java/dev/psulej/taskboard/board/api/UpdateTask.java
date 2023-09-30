@@ -6,10 +6,10 @@ import java.util.UUID;
 
 public record UpdateTask(
         @NotBlank
-        @Size(min=1, max=17, message = "Task title edit is valid")
+        @Size(min=1, max=500, message = "Task title edit is valid")
         String title,
 
-        @Size(max = 1000, message = "Task description too long")
+        @Size(max = 10000, message = "Task description too long")
         String description,
 
         UUID assignedUserId

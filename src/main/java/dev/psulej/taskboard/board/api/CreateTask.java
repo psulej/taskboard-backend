@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Size;
 
 public record CreateTask(
         @NotBlank
-        @Size(min=1, max=17, message = "Task title insert is valid")
+        @Size(min=1, max=500, message = "Task title insert is valid")
         String title,
 
-        @Size(max = 1000, message = "Task description too long")
+        @Size(max = 10000, message = "Task description too long")
         String description
 ) { }

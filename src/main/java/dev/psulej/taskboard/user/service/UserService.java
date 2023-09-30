@@ -5,6 +5,8 @@ import dev.psulej.taskboard.security.TokenProvider;
 import dev.psulej.taskboard.user.domain.UserRole;
 import dev.psulej.taskboard.user.api.RegisterRequest;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
+import dev.psulej.taskboard.user.exception.UserCannotBeExtracted;
+import dev.psulej.taskboard.user.exception.UserNotFoundException;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.repository.UserSettingsRepository;
@@ -38,7 +40,7 @@ public class UserService {
                 .filter(principal -> principal.getClass().isAssignableFrom(ApplicationUserDetails.class))
                 .map(principal -> (ApplicationUserDetails) principal)
                 .map(ApplicationUserDetails::getId)
-                .orElseThrow(() -> new IllegalStateException("User cannot be extracted"));
+                .orElseThrow(() -> new UserCannotBeExtracted("User cannot be extracted"));
     }
 
     public UserEntity getLoggedUser() {
@@ -48,9 +50,9 @@ public class UserService {
                 .filter(principal -> principal.getClass().isAssignableFrom(ApplicationUserDetails.class))
                 .map(principal -> (ApplicationUserDetails) principal)
                 .map(ApplicationUserDetails::getLogin)
-                .orElseThrow(() -> new IllegalStateException("User cannot be extracted"));
+                .orElseThrow(() -> new UserCannotBeExtracted("User cannot be extracted"));
         return findUserByLogin(login)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public Optional<UserEntity> findUserByLogin(String login) {

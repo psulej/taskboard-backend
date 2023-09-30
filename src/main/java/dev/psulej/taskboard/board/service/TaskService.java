@@ -5,11 +5,15 @@ import dev.psulej.taskboard.board.api.Task;
 import dev.psulej.taskboard.board.api.UpdateTask;
 import dev.psulej.taskboard.board.domain.ColumnEntity;
 import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.exception.BoardNotFoundException;
+import dev.psulej.taskboard.board.exception.ColumnNotFoundException;
+import dev.psulej.taskboard.board.exception.TaskNotFoundException;
 import dev.psulej.taskboard.board.mapper.TaskMapper;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
+import dev.psulej.taskboard.user.exception.UserNotFoundException;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +35,8 @@ public class TaskService {
 
     public Task addTask(UUID boardId, UUID columnId, CreateTask createTask) {
         ColumnEntity column = columnRepository.findById(columnId).orElseThrow(()
-                -> new IllegalArgumentException("Column not found"));
+                ->  new ColumnNotFoundException("Column with columnId " + columnId
+                + " was not found in the board with id: " + boardId));
         TaskEntity newTask = TaskEntity.builder()
                 .id(UUID.randomUUID())
                 .title(createTask.title())
@@ -54,7 +59,8 @@ public class TaskService {
 
     public void deleteTask(UUID boardId, UUID columnId, UUID taskId) {
         ColumnEntity column = columnRepository.findById(columnId).orElseThrow(()
-                -> new IllegalArgumentException("Column not found"));
+                -> new ColumnNotFoundException("Column with columnId " + columnId
+                + " was not found in the board with id: " + boardId));
         List<TaskEntity> oldTasksList = column.tasks();
         List<TaskEntity> newTaskList = oldTasksList.stream().filter(task -> task.id() != taskId).toList();
         ColumnEntity newColumn = ColumnEntity.builder()
@@ -68,12 +74,14 @@ public class TaskService {
     }
 
     public Task editTask(UUID boardId, UUID columnId, UUID taskId, UpdateTask updateTask) {
-        if (!boardRepository.existsById(boardId)) throw new IllegalArgumentException("Board not found");
-        if (!columnRepository.existsById(columnId)) throw new IllegalArgumentException("Column not found");
+        if (!boardRepository.existsById(boardId)) throw new BoardNotFoundException("Board with id: " + boardId +
+                " not found in the column with id: " + columnId);
+        if (!columnRepository.existsById(columnId)) throw new ColumnNotFoundException("Column with columnId " + columnId
+                + " was not found in the board with id: " + boardId);
         UserEntity assignedUser = Optional.ofNullable(updateTask.assignedUserId())
                 .map(assignedUserId ->
                         userRepository.findById(assignedUserId)
-                                .orElseThrow(() -> new IllegalArgumentException("User not found")))
+                                .orElseThrow(() -> new UserNotFoundException("User with id: " + assignedUserId + " not found")))
                 .orElse(null);
         TaskEntity taskEntity = taskRepository.findById(taskId)
                 .map(task -> task.toBuilder()
@@ -82,7 +90,8 @@ public class TaskService {
                         .assignedUser(assignedUser)
                         .build())
                 .map(taskRepository::save)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task with taskId: " + taskId + " was not found in the column with" +
+                        "columnId: " + columnId));
         boardUpdatePublisher.publish(boardId);
         return taskMapper.mapTask(taskEntity);
     }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record CreateColumn(
         @NotBlank
-        @Size(min=1, max=17, message = "Column title insert is valid")
+        @Size(min=1, max=500, message = "Column title insert is valid")
         String title
 ) {
 }

@@ -3,12 +3,14 @@ package dev.psulej.taskboard.board.service;
 import dev.psulej.taskboard.board.api.*;
 import dev.psulej.taskboard.board.domain.BoardEntity;
 import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.exception.BoardNotFoundException;
 import dev.psulej.taskboard.board.mapper.BoardMapper;
 import dev.psulej.taskboard.board.mapper.UserMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
 import dev.psulej.taskboard.user.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
+import dev.psulej.taskboard.user.exception.UserHasNoPermissionException;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +46,7 @@ public class BoardService {
     }
 
     public Board getBoard(UUID boardId) {
-        BoardEntity boardEntity = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board was not found"));
-//        boardUpdatePublisher.publish();
+        BoardEntity boardEntity = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
         return boardMapper.mapBoard(boardEntity);
     }
 
@@ -63,13 +64,12 @@ public class BoardService {
     }
 
     public Board editBoard(UUID boardId, UpdateBoard updateBoard) {
-        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
         List<UUID> updatedBoardIds = updateBoard.userIds();
         List<UserEntity> updatedBoardUsers = userRepository.findAllById(updatedBoardIds);
-
         UserEntity loggedUser = userService.getLoggedUser();
         if (!updatedBoardUsers.contains(loggedUser)) {
-            throw new IllegalArgumentException("Logged in user can not be deleted!");
+            throw new UserHasNoPermissionException("Logged user with id: " + loggedUser.id() + " cannot be deleted");
         }
 
         List<UUID> boardUsersIds = updateBoard.userIds();
@@ -93,14 +93,14 @@ public class BoardService {
     }
 
     public void deleteBoard(UUID boardId) {
-        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("Board not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
         boardRepository.deleteById(boardId);
         boardUpdatePublisher.publish(board);
     }
 
     public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("Board not found"));
+                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
         List<UUID> boardUserIds = board.users().stream().map(UserEntity::id).toList();
 
         Set<UUID> allExcludedUserIds = Stream.of(boardUserIds, excludedUserIds)

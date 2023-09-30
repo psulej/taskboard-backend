@@ -2,6 +2,7 @@ package dev.psulej.taskboard.board.service;
 
 import dev.psulej.taskboard.board.api.Board;
 import dev.psulej.taskboard.board.domain.BoardEntity;
+import dev.psulej.taskboard.board.exception.BoardNotFoundException;
 import dev.psulej.taskboard.board.mapper.BoardMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class BoardUpdatePublisher {
     public void publish(UUID boardId) {
         Board board = boardRepository.findById(boardId)
                 .map(boardMapper::mapBoard)
-                .orElseThrow(() -> new IllegalArgumentException("Board was not found"));
+                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " was not found"));
         this.publish(board);
     }
 

@@ -4,6 +4,7 @@ import dev.psulej.taskboard.image.domain.Image;
 import dev.psulej.taskboard.image.repository.ImageRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
+import dev.psulej.taskboard.user.exception.UserNotFoundException;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.repository.UserSettingsRepository;
 import lombok.AllArgsConstructor;
@@ -71,7 +72,8 @@ public class UserSettingsService {
 
     private void updateUserImage(Image image) {
         UUID loggedUserId = userService.getLoggedUser().id();
-        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new UserNotFoundException("User with id: "
+                + loggedUserId + " not found!"));
         UserEntity updatedUser = UserEntity.builder()
                 .id(user.id())
                 .login(user.login())
@@ -87,12 +89,14 @@ public class UserSettingsService {
 
     public UserSettingsEntity getUserSettings() {
         UUID loggedUserId = userService.getLoggedUser().id();
-        return userSettingsRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("Logged user not found!"));
+        return userSettingsRepository.findById(loggedUserId).orElseThrow(() -> new UserNotFoundException("User with id "
+                + loggedUserId + " not found!"));
     }
 
     public void deleteUserAvatar() {
         UUID loggedUserId = userService.getLoggedUser().id();
-        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new UserNotFoundException("User with id "
+                + loggedUserId + " not found!"));
         UserEntity updatedUser = UserEntity.builder()
                 .id(user.id())
                 .login(user.login())

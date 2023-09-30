@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record CreateBoard(
         @NotBlank
-        @Size(min=1, max=17, message = "Board name insert is valid")
+        @Size(min=1, max=100, message = "Board name insert is valid")
         String name
 ) {
 }

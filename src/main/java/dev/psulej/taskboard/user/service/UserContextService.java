@@ -2,6 +2,8 @@ package dev.psulej.taskboard.user.service;
 import dev.psulej.taskboard.user.api.UserContext;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
+import dev.psulej.taskboard.user.exception.UserNotFoundException;
+import dev.psulej.taskboard.user.exception.UserSettingsNotFound;
 import dev.psulej.taskboard.user.repository.UserRepository;
 import dev.psulej.taskboard.user.repository.UserSettingsRepository;
 import lombok.AllArgsConstructor;
@@ -19,8 +21,10 @@ public class UserContextService {
     public UserContext getUserLoggedUserContext() {
         UUID loggedUserId = userService.getLoggedUser().id();
 
-        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
-        UserSettingsEntity userSettings = userSettingsRepository.findByUserId(loggedUserId).orElseThrow(() -> new IllegalArgumentException("User settings not found!"));
+        UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() ->
+                new UserNotFoundException("User with id: " + loggedUserId + " not found!"));
+        UserSettingsEntity userSettings = userSettingsRepository.findByUserId(loggedUserId).orElseThrow(() ->
+                new UserSettingsNotFound("User settings for user with id: " + loggedUserId + " not found!"));
 
         return UserContext.builder()
                 .id(user.id())

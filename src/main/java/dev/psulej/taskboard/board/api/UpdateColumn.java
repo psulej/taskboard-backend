@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Size;
 
 public record UpdateColumn(
         @NotBlank
-        @Size(min=1, max=17, message = "Column title edit is valid")
+        @Size(min=1, max=500, message = "Column title edit is valid")
         String title
 ) {
 }
