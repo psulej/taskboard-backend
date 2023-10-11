@@ -10,7 +10,6 @@ import dev.psulej.taskboard.board.domain.TaskEntity;
 import dev.psulej.taskboard.board.exception.BoardNotFoundException;
 import dev.psulej.taskboard.board.exception.ColumnNotFoundException;
 import dev.psulej.taskboard.board.exception.TaskNotFoundException;
-import dev.psulej.taskboard.board.mapper.BoardMapper;
 import dev.psulej.taskboard.board.mapper.ColumnMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
@@ -27,12 +26,11 @@ public class ColumnService {
     private final BoardUpdatePublisher boardUpdatePublisher;
     private final ColumnRepository columnRepository;
     private final BoardRepository boardRepository;
-    private final BoardMapper boardMapper;
     private final ColumnMapper columnMapper;
 
     public void updateColumns(UUID boardId, List<UpdateColumnTasks> updatedColumns) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+                .orElseThrow(() -> new BoardNotFoundException(boardId));
         Map<UUID, TaskEntity> tasksById = board.columns().stream()
                 .map(ColumnEntity::tasks)
                 .flatMap(Collection::stream)
@@ -49,13 +47,13 @@ public class ColumnService {
             UUID columnId = updatedColumn.columnId();
             ColumnEntity column = columnsById.get(columnId);
             if (column == null) {
-                throw new ColumnNotFoundException("Column with columnId " + columnId + " was not found in the board with id: " + boardId);
+                throw new ColumnNotFoundException(boardId, columnId);
             }
             List<TaskEntity> newTasks = new ArrayList<>();
             updatedColumn.taskIds().forEach(taskId -> {
                 TaskEntity task = tasksById.get(taskId);
                 if (task == null) {
-                    throw new TaskNotFoundException("Task with id " + taskId + " was not found in the column with id: " + columnId);
+                    throw new TaskNotFoundException(columnId, taskId);
                 }
                 newTasks.add(task);
             });
@@ -80,7 +78,7 @@ public class ColumnService {
 
     public Column addColumn(UUID boardId, CreateColumn createColumn) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+                .orElseThrow(() -> new BoardNotFoundException(boardId));
         ColumnEntity column = ColumnEntity.builder()
                 .id(UUID.randomUUID())
                 .name(createColumn.title())
@@ -102,8 +100,7 @@ public class ColumnService {
     }
 
     public Column editColumn(UUID boardId, UUID columnId, UpdateColumn updateColumn) {
-        if (!boardRepository.existsById(boardId)) throw new BoardNotFoundException("Board with id: " + boardId +
-                " not found in the column with id: " + columnId);
+        if (!boardRepository.existsById(boardId)) throw new BoardNotFoundException(boardId, columnId);
         ColumnEntity columnEntity = columnRepository.findById(columnId)
                 .map(column -> ColumnEntity.builder()
                         .id(column.id())
@@ -111,16 +108,14 @@ public class ColumnService {
                         .tasks(column.tasks())
                         .build())
                 .map(columnRepository::save)
-                .orElseThrow(() -> new ColumnNotFoundException("Column with columnId " + columnId
-                        + " was not found in the board with id: " + boardId));
+                .orElseThrow(() -> new ColumnNotFoundException(boardId, columnId));
         boardUpdatePublisher.publish(boardId);
         return columnMapper.mapColumn(columnEntity);
     }
 
     public void deleteColumn(UUID boardId, UUID columnId) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId +
-                " not found in the column with id: " + columnId));
+                .orElseThrow(() -> new BoardNotFoundException(boardId, columnId));
         List<ColumnEntity> oldColumnList = board.columns();
         List<ColumnEntity> newColumnList = oldColumnList.stream().filter(column -> !column.id().equals(columnId)).toList();
         BoardEntity newBoard = BoardEntity.builder()

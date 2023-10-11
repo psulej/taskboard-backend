@@ -27,7 +27,10 @@ public record TaskEntity(
         UserEntity assignedUser,
 
         @DBRef(lazy = true)
-        List<CommentEntity> comments
+        List<CommentEntity> comments,
+
+        @Field
+        TaskPriority priority
 ) {
 
 }

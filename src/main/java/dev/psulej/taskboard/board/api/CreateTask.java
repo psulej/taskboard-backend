@@ -1,5 +1,6 @@
 package dev.psulej.taskboard.board.api;
 
+import dev.psulej.taskboard.board.domain.TaskPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,5 +10,7 @@ public record CreateTask(
         String title,
 
         @Size(max = 10000, message = "Task description too long")
-        String description
+        String description,
+
+        TaskPriority priority
 ) { }

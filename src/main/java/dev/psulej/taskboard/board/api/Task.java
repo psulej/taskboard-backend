@@ -1,4 +1,5 @@
 package dev.psulej.taskboard.board.api;
+import dev.psulej.taskboard.board.domain.TaskPriority;
 import dev.psulej.taskboard.user.api.User;
 import lombok.Builder;
 
@@ -10,6 +11,7 @@ public record Task(
         UUID id,
         String title,
         String description,
-        User assignedUser
+        User assignedUser,
+        TaskPriority priority
 ) {
 }

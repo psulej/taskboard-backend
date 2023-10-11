@@ -24,7 +24,7 @@ public class BoardUpdatePublisher {
     public void publish(UUID boardId) {
         Board board = boardRepository.findById(boardId)
                 .map(boardMapper::mapBoard)
-                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " was not found"));
+                .orElseThrow(() -> new BoardNotFoundException(boardId));
         this.publish(board);
     }
 
@@ -33,7 +33,6 @@ public class BoardUpdatePublisher {
     }
 
     public void publish(Board board) {
-        // Sends new board to board topic, for example /topic/boards/e6cd5ba2-c06c-4b78-93ea-8c07c3f4cf51
         simpMessagingTemplate.convertAndSend("/topic/boards/%s".formatted(board.id()), board);
     }
 }

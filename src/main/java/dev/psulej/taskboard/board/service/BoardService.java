@@ -46,7 +46,7 @@ public class BoardService {
     }
 
     public Board getBoard(UUID boardId) {
-        BoardEntity boardEntity = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+        BoardEntity boardEntity = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException(boardId));
         return boardMapper.mapBoard(boardEntity);
     }
 
@@ -64,7 +64,7 @@ public class BoardService {
     }
 
     public Board editBoard(UUID boardId, UpdateBoard updateBoard) {
-        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException(boardId));
         List<UUID> updatedBoardIds = updateBoard.userIds();
         List<UserEntity> updatedBoardUsers = userRepository.findAllById(updatedBoardIds);
         UserEntity loggedUser = userService.getLoggedUser();
@@ -93,14 +93,14 @@ public class BoardService {
     }
 
     public void deleteBoard(UUID boardId) {
-        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+        BoardEntity board = boardRepository.findById(boardId).orElseThrow(() -> new BoardNotFoundException(boardId));
         boardRepository.deleteById(boardId);
         boardUpdatePublisher.publish(board);
     }
 
     public List<User> getAssignableUsers(UUID boardId, String loginPhrase, List<UUID> excludedUserIds) {
         BoardEntity board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BoardNotFoundException("Board with id: " + boardId + " not found"));
+                .orElseThrow(() -> new BoardNotFoundException(boardId));
         List<UUID> boardUserIds = board.users().stream().map(UserEntity::id).toList();
 
         Set<UUID> allExcludedUserIds = Stream.of(boardUserIds, excludedUserIds)

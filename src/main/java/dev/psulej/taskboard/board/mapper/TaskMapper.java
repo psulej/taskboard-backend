@@ -16,6 +16,7 @@ public class TaskMapper {
                 .title(task.title())
                 .description(task.description())
                 .assignedUser(task.assignedUser() != null ? userMapper.mapUser(task.assignedUser()) : null)
+                .priority(task.priority())
                 .build();
     }
 

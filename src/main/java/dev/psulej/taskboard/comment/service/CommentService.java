@@ -1,7 +1,5 @@
 package dev.psulej.taskboard.comment.service;
-
 import dev.psulej.taskboard.board.domain.TaskEntity;
-import dev.psulej.taskboard.board.exception.ColumnNotFoundException;
 import dev.psulej.taskboard.board.exception.TaskNotFoundException;
 import dev.psulej.taskboard.board.mapper.CommentMapper;
 import dev.psulej.taskboard.board.repository.TaskRepository;
@@ -9,6 +7,7 @@ import dev.psulej.taskboard.comment.api.Comment;
 import dev.psulej.taskboard.comment.api.CreateComment;
 import dev.psulej.taskboard.comment.api.UpdateComment;
 import dev.psulej.taskboard.comment.domain.CommentEntity;
+import dev.psulej.taskboard.comment.exception.CommentNotFoundException;
 import dev.psulej.taskboard.comment.repository.CommentRepository;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.exception.UserHasNoPermissionException;
@@ -33,7 +32,7 @@ public class CommentService {
     private final CommentCreatedPublisher commentCreatedPublisher;
 
     public Comment addComment(UUID taskId, CreateComment newComment) {
-        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task with taskId: " + taskId + " not found"));
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException(taskId));
         UserEntity loggedUser = userService.getLoggedUser();
 
         CommentEntity commentEntity = CommentEntity.builder()
@@ -71,11 +70,12 @@ public class CommentService {
 
     private CommentEntity checkUserCommentPermission(UUID commentId) {
         CommentEntity comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ColumnNotFoundException("Comment with id: "+ commentId +" not found"));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
         UUID loggedUserId = userService.getLoggedUserId();
         UUID commentUserId = comment.user().id();
         if(!loggedUserId.equals(commentUserId)) {
-            throw new UserHasNoPermissionException("User has not permission to edit comment with id: " + commentId);
+            throw new UserHasNoPermissionException("User with id: " + loggedUserId +
+                    " has not permission to edit comment with id: " + commentId);
         }
         return comment;
     }
@@ -95,7 +95,7 @@ public class CommentService {
     }
 
     public List<Comment> getComments(UUID taskId) {
-        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException("Task with id: " + taskId + " not found"));
+        TaskEntity taskEntity = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException(taskId));
         List<CommentEntity> taskComments = (List<CommentEntity>) CollectionUtils.emptyIfNull(taskEntity.comments());
         return taskComments.stream().map(commentMapper::mapComment).toList();
     }

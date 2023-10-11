@@ -1,5 +1,6 @@
 package dev.psulej.taskboard.board.api;
 
+import dev.psulej.taskboard.board.domain.TaskPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
@@ -12,5 +13,7 @@ public record UpdateTask(
         @Size(max = 10000, message = "Task description too long")
         String description,
 
-        UUID assignedUserId
+        UUID assignedUserId,
+
+        TaskPriority priority
 ) { }
