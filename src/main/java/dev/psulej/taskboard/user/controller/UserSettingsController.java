@@ -1,4 +1,5 @@
 package dev.psulej.taskboard.user.controller;
+import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.service.UserSettingsService;
 import lombok.AllArgsConstructor;
@@ -18,11 +19,11 @@ public class UserSettingsController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadSettings(
             @RequestParam(name = "file", required=false) MultipartFile file,
-            @RequestParam(name = "theme") String theme,
+            @RequestParam(name = "theme") ApplicationTheme applicationTheme,
             @RequestParam(name = "avatarColor") String avatarColor
     ) {
         try {
-            userSettingsService.uploadSettings(file, theme, avatarColor);
+            userSettingsService.uploadSettings(file, applicationTheme, avatarColor);
             return new ResponseEntity<>("Settings save successful", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Settings save failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

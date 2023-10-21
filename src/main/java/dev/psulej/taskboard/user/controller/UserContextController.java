@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user-context")
 @RequiredArgsConstructor
 public class UserContextController {
+
     private final UserContextService userContextService;
+
     @GetMapping
     public UserContext getUserLoggedUserContext() {
         return userContextService.getUserLoggedUserContext();

@@ -5,6 +5,7 @@ import dev.psulej.taskboard.board.domain.TaskEntity;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
+import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserRole;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
@@ -49,7 +50,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             UserSettingsEntity userSettings = UserSettingsEntity.builder()
                     .userId(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
-                    .theme("dark")
+                    .applicationTheme(ApplicationTheme.DARK)
                     .build();
 
             userSettingsRepository.save(userSettings);

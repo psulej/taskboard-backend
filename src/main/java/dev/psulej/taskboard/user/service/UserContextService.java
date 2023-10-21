@@ -20,7 +20,6 @@ public class UserContextService {
 
     public UserContext getUserLoggedUserContext() {
         UUID loggedUserId = userService.getLoggedUser().id();
-
         UserEntity user = userRepository.findById(loggedUserId).orElseThrow(() ->
                 new UserNotFoundException("User with id: " + loggedUserId + " not found!"));
         UserSettingsEntity userSettings = userSettingsRepository.findByUserId(loggedUserId).orElseThrow(() ->
@@ -32,7 +31,7 @@ public class UserContextService {
                 .email(user.email())
                 .name(user.name())
                 .imageId(user.imageId())
-                .theme(userSettings.theme())
+                .applicationTheme(userSettings.applicationTheme())
                 .avatarColor(user.avatarColor())
                 .build();
     }

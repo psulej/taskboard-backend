@@ -2,6 +2,7 @@ package dev.psulej.taskboard.user.service;
 
 import dev.psulej.taskboard.image.domain.Image;
 import dev.psulej.taskboard.image.repository.ImageRepository;
+import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.exception.UserNotFoundException;
@@ -27,7 +28,7 @@ public class UserSettingsService {
     private final UserService userService;
     private final UserSettingsRepository userSettingsRepository;
 
-    public void uploadSettings(MultipartFile file, String theme, String avatarColor) {
+    public void uploadSettings(MultipartFile file, ApplicationTheme applicationTheme, String avatarColor) {
         try {
             if (file != null) {
                 String fileName = file.getOriginalFilename();
@@ -35,19 +36,19 @@ public class UserSettingsService {
                 Image image = persistImage(file, fileName);
                 updateUserImage(image);
             }
-            updateUserSettings(theme, avatarColor);
+            updateUserSettings(applicationTheme, avatarColor);
         } catch (Exception e) {
             log.error("Upload failed: " + e.getMessage(), e);
         }
     }
 
 
-    private void updateUserSettings(String theme, String avatarColor) {
+    private void updateUserSettings(ApplicationTheme applicationTheme, String avatarColor) {
         UUID loggedUserId = userService.getLoggedUser().id();
 
         userSettingsRepository.findByUserId(loggedUserId)
                 .map(userSettings -> userSettings.toBuilder()
-                        .theme(theme)
+                        .applicationTheme(applicationTheme)
                         .build()
                 )
                 .ifPresent(userSettingsRepository::save);

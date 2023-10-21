@@ -12,6 +12,5 @@ public class TaskBoardBackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(TaskBoardBackendApplication.class, args);
-
     }
 }

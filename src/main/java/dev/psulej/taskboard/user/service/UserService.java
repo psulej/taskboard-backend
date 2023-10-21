@@ -2,6 +2,7 @@ package dev.psulej.taskboard.user.service;
 
 import dev.psulej.taskboard.security.ApplicationUserDetails;
 import dev.psulej.taskboard.security.TokenProvider;
+import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.domain.UserRole;
 import dev.psulej.taskboard.user.api.RegisterRequest;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
@@ -77,7 +78,7 @@ public class UserService {
 
         UserSettingsEntity userSettings = UserSettingsEntity.builder()
                 .userId(registeredUserUUID)
-                .theme("dark")
+                .applicationTheme(ApplicationTheme.DARK)
                 .build();
 
         userSettingsRepository.save(userSettings);
