@@ -12,11 +12,11 @@ public record ApplicationTheme(@JsonValue String value) {
     @ConstructorProperties("value")
     public ApplicationTheme(String value) {
         Assert.hasText(value, "Application theme cannot be empty");
-//        Assert.isTrue(isThemeAllowed(value), "Application theme was not recognized");
+        Assert.isTrue(isThemeAllowed(value), "Application theme was not recognized");
         this.value = value;
     }
 
     private static boolean isThemeAllowed(String value) {
-        return List.of("dark", "light").contains(value);
+        return List.of("dark", "light", "candy","blue","green","purple").contains(value);
     }
 }
