@@ -6,7 +6,6 @@ import dev.psulej.taskboard.board.api.CreateBoard;
 import dev.psulej.taskboard.board.api.UpdateBoard;
 import dev.psulej.taskboard.board.service.BoardService;
 import dev.psulej.taskboard.user.api.User;
-import dev.psulej.taskboard.user.domain.UserEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

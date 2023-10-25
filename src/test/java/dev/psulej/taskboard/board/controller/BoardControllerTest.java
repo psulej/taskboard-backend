@@ -1,5 +1,4 @@
 package dev.psulej.taskboard.board.controller;
-
 import dev.psulej.taskboard.board.api.*;
 import dev.psulej.taskboard.board.domain.TaskPriority;
 import dev.psulej.taskboard.board.service.BoardService;
@@ -18,12 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -53,7 +49,7 @@ class BoardControllerTest {
 
     @Test
     @DisplayName("Get board test")
-    void shouldReturnGetBoardSuccessResponse() throws Exception {
+    void whenGetBoard_shouldReturn200statusCodeandReturnboard() throws Exception {
         // given
         UUID boardId = UUID.fromString("4a000f56-6c84-4e6c-8601-e34419c202d1");
 
@@ -98,7 +94,8 @@ class BoardControllerTest {
                                                         .description("testTaskDescription2")
                                                         .assignedUser(secondBoardUser)
                                                         .priority(TaskPriority.HIGH)
-                                                        .build())).build(),
+                                                        .build()))
+                                        .build(),
                                 Column.builder()
                                         .id(UUID.fromString("f335d812-7103-11ee-b962-0242ac120002"))
                                         .name("testColumn2")
@@ -221,11 +218,10 @@ class BoardControllerTest {
     @Test
     @DisplayName("Add board test")
     void shouldReturnAddBoardSuccessResponse() throws Exception {
-
         // given
+
         UUID boardId = UUID.fromString("b4a5fdd3-b467-4c61-81b4-83a243d001e2");
         String boardName = "testowyBoard";
-
 
         Board board = Board.builder()
                 .id(boardId)
@@ -275,11 +271,10 @@ class BoardControllerTest {
 
     @Test
     @DisplayName("Edit board test")
-    void shouldEditBoardReturnSuccess() throws Exception {
+    void shouldEditBoardReturnSuccessResponse() throws Exception {
         // given
         UUID boardId = UUID.fromString("2b31501a-0e74-4515-b1e6-e5a4c8518924");
         String boardName = "testowyBoard";
-
 
         Board board = Board.builder()
                 .id(boardId)
@@ -337,7 +332,7 @@ class BoardControllerTest {
 
     @Test
     @DisplayName("Delete board test")
-    void shouldDeleteBoardReturnSuccess() throws Exception {
+    void shouldDeleteBoardReturnSuccessResponse() throws Exception {
         // given
         UUID boardId = UUID.fromString("3eed8d1c-7128-11ee-b962-0242ac120002");
 
@@ -349,13 +344,12 @@ class BoardControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        Mockito.verify(boardService, Mockito.times(1)).deleteBoard(boardId);
+        Mockito.verify(boardService).deleteBoard(boardId);
     }
 
     @Test
     @DisplayName("Get boards test")
-    void shouldGetBoardReturnSuccess() throws Exception {
-
+    void shouldGetBoardReturnSuccessResponse() throws Exception {
         // given
         List<AvailableBoard> availableBoards = List.of(
                 new AvailableBoard(UUID.fromString("e769f2a6-712c-11ee-b962-0242ac120002"), "testBoard1"),
@@ -368,7 +362,8 @@ class BoardControllerTest {
         );
 
         // when
-        this.mockMvc.perform(get("/boards"))
+        this.mockMvc
+                .perform(get("/boards"))
                 // then
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -395,7 +390,7 @@ class BoardControllerTest {
 
     @Test
     @DisplayName("Get assignable users for board test")
-    void shouldGetAssignableUserReturnSuccess() throws Exception {
+    void shouldGetAssignableUserReturnSuccessResponse() throws Exception {
         // given
         UUID boardId = UUID.fromString("33e34bae-712e-11ee-b962-0242ac120002");
         String loginPhrase = "test";
