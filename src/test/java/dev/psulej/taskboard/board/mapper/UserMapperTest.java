@@ -4,6 +4,7 @@ package dev.psulej.taskboard.board.mapper;
 import dev.psulej.taskboard.user.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserRole;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -15,8 +16,9 @@ class UserMapperTest {
     private final UserMapper userMapper = new UserMapper();
 
     @Test
-    void shouldMap() {
-        UserEntity entity = UserEntity.builder()
+    @DisplayName("Map user test")
+    void shouldMapUser() {
+        UserEntity userEntity = UserEntity.builder()
                 .id(UUID.fromString("0dd72a53-17be-4b35-ac87-d2cde83dc9d2"))
                 .login("johndoe")
                 .email("johndoe@localhost")
@@ -25,7 +27,7 @@ class UserMapperTest {
                 .imageId(UUID.fromString("3c9eef1b-d27b-40bf-a504-e997ac877a6e"))
                 .build();
 
-        User user = userMapper.mapUser(entity);
+        User user = userMapper.mapUser(userEntity);
 
         assertThat(user).isNotNull();
         assertThat(user.login()).isEqualTo("johndoe");
@@ -34,6 +36,7 @@ class UserMapperTest {
 
 
     @Test
+    @DisplayName("Map user without image id test")
     void shouldMapUserWithoutImageIdSet() {
         UserEntity entity = UserEntity.builder()
                 .id(UUID.fromString("0dd72a53-17be-4b35-ac87-d2cde83dc9d2"))
