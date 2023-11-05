@@ -6,9 +6,8 @@ import dev.psulej.taskboard.board.service.BoardService;
 import dev.psulej.taskboard.board.service.ColumnService;
 import dev.psulej.taskboard.config.TestConfiguration;
 import dev.psulej.taskboard.security.TokenProvider;
-import dev.psulej.taskboard.user.api.User;
+import dev.psulej.taskboard.board.api.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,6 @@ class ColumnControllerTest {
     }
 
     @Test
-    @DisplayName("Add column test")
     void whenAddColumn_shouldReturn200StatusCode_andNewColumn() throws Exception {
         // given
         UUID boardId = UUID.fromString("d60219b8-020b-47d0-aa81-5f2365d16bdd");
@@ -136,7 +134,6 @@ class ColumnControllerTest {
     }
 
     @Test
-    @DisplayName("Edit column test")
     void whenEditColumn_shouldReturn200StatusCode_andEditedColumn() throws Exception {
         // given
         UUID boardId = UUID.fromString("1a908648-71bb-11ee-b962-0242ac120002");
@@ -225,7 +222,6 @@ class ColumnControllerTest {
     }
 
     @Test
-    @DisplayName("Delete column test")
     void whenDeleteColumn_shouldReturn200StatusCode() throws Exception {
         // given
         UUID boardId = UUID.fromString("35830810-71e6-11ee-b962-0242ac120002");
@@ -238,10 +234,11 @@ class ColumnControllerTest {
                 // then
                 .andDo(print())
                 .andExpect(status().isOk());
+
+        Mockito.verify(columnService).deleteColumn(boardId, columnId);
     }
 
     @Test
-    @DisplayName("Update columns test")
     void whenUpdateColumns_shouldReturn200StatusCode() throws Exception {
         // given
         UUID boardId = UUID.fromString("35830810-71e6-11ee-b962-0242ac120002");

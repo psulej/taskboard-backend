@@ -1,7 +1,6 @@
 package dev.psulej.taskboard.init;
-import dev.psulej.taskboard.board.domain.BoardEntity;
-import dev.psulej.taskboard.board.domain.ColumnEntity;
-import dev.psulej.taskboard.board.domain.TaskEntity;
+import dev.psulej.taskboard.board.domain.*;
+import dev.psulej.taskboard.board.mapper.UserMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
@@ -15,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,16 +37,22 @@ public class DatabaseInitializer implements CommandLineRunner {
                     UserEntity.builder()
                             .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
                             .login("asmith")
+                            .role(UserRole.USER)
                             .password(passwordEncoder.encode("asmith"))
                             .name("Anna")
                             .email("asmith@yahoo.com")
-                            .role(UserRole.USER)
                             .imageId(null)
                             .avatarColor("#B80000")
                             .build()
             );
-
             userRepository.saveAll(users);
+
+            List<BoardUser> boardUsersList = List.of(
+                    BoardUser.builder()
+                            .user(users.get(0))
+                            .joinedAt(Instant.now())
+                            .role(BoardUserRole.BOARD_ADMINISTRATOR)
+                    .build());
 
 
             UserSettingsEntity userSettings = UserSettingsEntity.builder()
@@ -122,7 +129,7 @@ public class DatabaseInitializer implements CommandLineRunner {
             BoardEntity board1 = BoardEntity.builder()
                     .id(UUID.fromString("835aa43b-5baa-400f-b7ca-2aca541ba7b7"))
                     .name("board1")
-                    .users(users)
+                    .users(boardUsersList)
                     .columns(columns)
                     .build();
 

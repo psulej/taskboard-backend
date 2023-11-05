@@ -46,8 +46,7 @@ class UserContextControllerTest {
     }
 
     @Test
-    @DisplayName("Get user context test")
-    void shouldReturnGetUserSuccessResponse() throws Exception {
+    void when_GetLoggedUserContext_shouldReturn200StatusCode_andUserContext() throws Exception {
         // given
         UserContext userContext = UserContext.builder()
                 .login("johndoe")

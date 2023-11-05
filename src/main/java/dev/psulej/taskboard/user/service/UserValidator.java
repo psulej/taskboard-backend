@@ -11,8 +11,8 @@ import java.util.List;
 
 @Component
 public class UserValidator {
-    private final UserRepository userRepository;
 
+    private final UserRepository userRepository;
     public UserValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

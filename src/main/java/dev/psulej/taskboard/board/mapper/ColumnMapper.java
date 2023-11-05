@@ -16,8 +16,8 @@ public class ColumnMapper {
                 .id(column.id())
                 .name(column.name())
                 .tasks(CollectionUtils.emptyIfNull(column.tasks()).stream()
-                        .map(taskMapper::mapTask
-                        ).toList())
+                        .map(taskMapper::mapTask)
+                        .toList())
                 .build();
     }
 }

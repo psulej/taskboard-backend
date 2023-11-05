@@ -1,6 +1,5 @@
 package dev.psulej.taskboard.board.domain;
 
-import dev.psulej.taskboard.user.domain.UserEntity;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -19,10 +18,10 @@ public record BoardEntity(
         @Field
         String name,
 
-        @DBRef
-        List<UserEntity> users,
+        List<BoardUser> users,
 
         @DBRef
         List<ColumnEntity> columns
 ) {
 }
+

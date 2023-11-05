@@ -1,6 +1,5 @@
 package dev.psulej.taskboard.board.api;
 import dev.psulej.taskboard.board.domain.TaskPriority;
-import dev.psulej.taskboard.user.api.User;
 import lombok.Builder;
 
 

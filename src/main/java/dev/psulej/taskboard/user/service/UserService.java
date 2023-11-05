@@ -72,7 +72,6 @@ public class UserService {
                 .name(registerRequest.name())
                 .email(registerRequest.email())
                 .role(UserRole.USER)
-                .imageId(null)
                 .avatarColor(getRandomAvatarColor())
                 .build();
 

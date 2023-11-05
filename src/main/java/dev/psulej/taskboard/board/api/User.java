@@ -1,4 +1,4 @@
-package dev.psulej.taskboard.user.api;
+package dev.psulej.taskboard.board.api;
 
 import lombok.Builder;
 

@@ -7,12 +7,12 @@ import dev.psulej.taskboard.board.domain.BoardEntity;
 import dev.psulej.taskboard.board.domain.ColumnEntity;
 import dev.psulej.taskboard.board.domain.TaskEntity;
 import dev.psulej.taskboard.board.domain.TaskPriority;
-import dev.psulej.taskboard.user.api.User;
+import dev.psulej.taskboard.board.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserRole;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +27,6 @@ class BoardMapperTest {
     private final BoardMapper boardMapper = new BoardMapper(columnMapper, userMapper);
 
     @Test
-    @DisplayName("Map board test")
     void shouldMapBoard() {
 
         UserEntity userEntity = UserEntity.builder()
@@ -59,7 +58,6 @@ class BoardMapperTest {
                                                         .id(UUID.fromString("f55fe0a8-71f6-11ee-b962-0242ac120002"))
                                                         .title("testTaskTitle2")
                                                         .description("testTaskDescription2")
-                                                        .assignedUser(null)
                                                         .priority(TaskPriority.LOW)
                                                         .build()
 
@@ -112,5 +110,30 @@ class BoardMapperTest {
 
         Task secondTaskInFirstColumn = firstColumn.tasks().get(1);
         assertThat(secondTaskInFirstColumn.assignedUser()).isNull();
+    }
+
+    @Test
+    void shouldMapBoardWithNullColumns() {
+        BoardEntity boardEntity = BoardEntity.builder()
+                .id(UUID.fromString("fe8bb73e-71f5-11ee-b962-0242ac120002"))
+                .name("testBoard")
+                .build();
+        Board board = boardMapper.mapBoard(boardEntity);
+        assertThat(board).isNotNull();
+        assertThat(board.name()).isEqualTo("testBoard");
+        assertThat(board.columns()).isEmpty();
+    }
+
+    @Test
+    void shouldMapBoardWithEmptyColumns() {
+        BoardEntity boardEntity = BoardEntity.builder()
+                .id(UUID.fromString("fe8bb73e-71f5-11ee-b962-0242ac120002"))
+                .name("testBoard")
+                .columns(Collections.emptyList())
+                .build();
+        Board board = boardMapper.mapBoard(boardEntity);
+        assertThat(board).isNotNull();
+        assertThat(board.name()).isEqualTo("testBoard");
+        assertThat(board.columns()).isEmpty();
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class UserCannotBeExtracted extends IllegalArgumentException{
-    public UserCannotBeExtracted(String s) {
-        super(s);
+    public UserCannotBeExtracted(String message) {
+        super(message);
     }
 }
