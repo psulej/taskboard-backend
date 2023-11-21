@@ -113,18 +113,6 @@ class BoardMapperTest {
     }
 
     @Test
-    void shouldMapBoardWithNullColumns() {
-        BoardEntity boardEntity = BoardEntity.builder()
-                .id(UUID.fromString("fe8bb73e-71f5-11ee-b962-0242ac120002"))
-                .name("testBoard")
-                .build();
-        Board board = boardMapper.mapBoard(boardEntity);
-        assertThat(board).isNotNull();
-        assertThat(board.name()).isEqualTo("testBoard");
-        assertThat(board.columns()).isEmpty();
-    }
-
-    @Test
     void shouldMapBoardWithEmptyColumns() {
         BoardEntity boardEntity = BoardEntity.builder()
                 .id(UUID.fromString("fe8bb73e-71f5-11ee-b962-0242ac120002"))

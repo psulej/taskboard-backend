@@ -40,17 +40,6 @@ public class BoardPermissionValidator {
         }
     }
 
-    public void validateBoardReading(UUID boardId) {
-        BoardUserRole userRole = getLoggedUserRole(boardId);
-        if (!isRoleAllowedToReadBoard(userRole)) {
-            throw new AccessDeniedException("Role not allowed for reading");
-        }
-    }
-
-    private boolean isRoleAllowedToReadBoard(BoardUserRole userRole) {
-        return List.of(BoardUserRole.BOARD_ADMINISTRATOR, BoardUserRole.BOARD_USER).contains(userRole);
-    }
-
     private boolean isRoleAllowedToModifyBoard(BoardUserRole userRole) {
         return Objects.equals(BoardUserRole.BOARD_ADMINISTRATOR, userRole);
     }

@@ -72,9 +72,10 @@ class TaskControllerTest {
                 .build();
 
         when(taskService.addTask(boardId, columnId,
-                new CreateTask("taskTitle", "taskDescription", TaskPriority.LOW)))
+                new CreateTask("taskTitle", "taskDescription", assignedUser.id(),TaskPriority.LOW)))
                 .thenReturn(task);
 
+        // when
         this.mockMvc.perform(post("/boards/5623603c-7386-11ee-b962-0242ac120002/columns/71bf4932-7386-11ee-b962-0242ac120002/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
@@ -82,6 +83,7 @@ class TaskControllerTest {
                                                 {
                                                     "title" : "taskTitle",
                                                     "description" : "taskDescription",
+                                                    "assignedUserId" : "feab66d8-7385-11ee-b962-0242ac120002",
                                                     "priority" : "LOW"                   
                                                 }
                                         """

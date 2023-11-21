@@ -15,7 +15,6 @@ import java.util.UUID;
 public class CommentCreatedPublisher {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-
     public void publish(UUID taskId, Comment comment) {
         String destination = "/topic/tasks/%s/comments".formatted(taskId);
         simpMessagingTemplate.convertAndSend(destination, comment);

@@ -49,6 +49,4 @@ class UserMapperTest {
         assertThat(user.login()).isEqualTo("johndoe");
         assertThat(user.imageId()).isNull();
     }
-
-
 }

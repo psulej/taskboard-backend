@@ -33,14 +33,23 @@ public class TaskService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
 
-    public Task addTask(UUID boardId, UUID columnId, CreateTask createTask) {
-        ColumnEntity column = columnRepository.findById(columnId).orElseThrow(()
+    public Task addTask(UUID boardId, UUID columnId,
+                        CreateTask createTask) {
+        ColumnEntity column = columnRepository.
+                findById(columnId).orElseThrow(()
                 ->  new ColumnNotFoundException(boardId, columnId));
+        UserEntity assignedUser = Optional.ofNullable(createTask.
+                        assignedUserId())
+                .map(assignedUserId ->
+                        userRepository.findById(assignedUserId)
+                                .orElseThrow(() -> new UserNotFoundException
+                                        ("User with id: " + assignedUserId + " not found")))
+                .orElse(null);
         TaskEntity newTask = TaskEntity.builder()
                 .id(UUID.randomUUID())
                 .title(createTask.title())
                 .description(createTask.description())
-                .assignedUser(null)
+                .assignedUser(assignedUser)
                 .priority(createTask.priority())
                 .build();
         List<TaskEntity> oldTasksList = column.tasks();
