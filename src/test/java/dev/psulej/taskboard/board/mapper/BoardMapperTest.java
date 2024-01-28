@@ -11,13 +11,10 @@ import dev.psulej.taskboard.board.api.User;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserRole;
 import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 class BoardMapperTest {
 
@@ -28,7 +25,7 @@ class BoardMapperTest {
 
     @Test
     void shouldMapBoard() {
-
+        // given
         UserEntity userEntity = UserEntity.builder()
                 .id(UUID.fromString("0dd72a53-17be-4b35-ac87-d2cde83dc9d2"))
                 .login("johndoe")
@@ -90,7 +87,10 @@ class BoardMapperTest {
                 ))
                 .build();
 
+        // when
         Board board = boardMapper.mapBoard(boardEntity);
+
+        // then
         assertThat(board).isNotNull();
         assertThat(board.name()).isEqualTo("testBoard");
         assertThat(board.columns()).hasSize(2);
@@ -114,12 +114,17 @@ class BoardMapperTest {
 
     @Test
     void shouldMapBoardWithEmptyColumns() {
+        // given
         BoardEntity boardEntity = BoardEntity.builder()
                 .id(UUID.fromString("fe8bb73e-71f5-11ee-b962-0242ac120002"))
                 .name("testBoard")
                 .columns(Collections.emptyList())
                 .build();
+
+        // when
         Board board = boardMapper.mapBoard(boardEntity);
+
+        // then
         assertThat(board).isNotNull();
         assertThat(board.name()).isEqualTo("testBoard");
         assertThat(board.columns()).isEmpty();

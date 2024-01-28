@@ -2,6 +2,7 @@ package dev.psulej.taskboard.image.controller;
 import dev.psulej.taskboard.image.domain.Image;
 import dev.psulej.taskboard.image.repository.ImageRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/public/images")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ImageController {
 
     private final ImageRepository imageRepository;

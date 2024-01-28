@@ -7,7 +7,6 @@ import dev.psulej.taskboard.board.service.BoardService;
 import dev.psulej.taskboard.config.TestConfiguration;
 import dev.psulej.taskboard.security.TokenProvider;
 import dev.psulej.taskboard.board.api.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +14,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,11 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BoardController.class)
 @Import(TestConfiguration.class)
+@WithMockUser
 class BoardControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
     @MockBean
@@ -44,12 +40,6 @@ class BoardControllerTest {
 
     @MockBean
     TokenProvider tokenProvider;
-
-
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     void whenGetBoard_shouldReturn200StatusCode_andReturnBoard() throws Exception {
@@ -77,8 +67,12 @@ class BoardControllerTest {
                 .name("Test board")
                 .users(
                         List.of(
-                                new BoardUser(user1, BoardUserRole.BOARD_ADMINISTRATOR, Instant.parse("2023-11-11T16:37:20.806Z")),
-                                new BoardUser(user2, BoardUserRole.BOARD_USER, Instant.parse("2023-11-11T16:37:20.806Z"))
+                                new BoardUser(user1,
+                                        BoardUserRole.BOARD_ADMINISTRATOR,
+                                        Instant.parse("2023-11-11T16:37:20.806Z")),
+                                new BoardUser(user2,
+                                        BoardUserRole.BOARD_USER,
+                                        Instant.parse("2023-11-11T16:37:20.806Z"))
                         )
                 )
                 .columns(
@@ -88,14 +82,16 @@ class BoardControllerTest {
                                         .name("Test column 1")
                                         .tasks(List.of(
                                                 Task.builder()
-                                                        .id(UUID.fromString("7e2e7e9b-affb-4aba-be3d-87ed51cd3302"))
+                                                        .id(UUID.fromString
+                                                                ("7e2e7e9b-affb-4aba-be3d-87ed51cd3302"))
                                                         .title("testTask1")
                                                         .description("testDescription1")
                                                         .assignedUser(user2)
                                                         .priority(TaskPriority.HIGH)
                                                         .build(),
                                                 Task.builder()
-                                                        .id(UUID.fromString("083009b6-4076-485f-8e7d-ef9cd02b3828"))
+                                                        .id(UUID.fromString
+                                                                ("083009b6-4076-485f-8e7d-ef9cd02b3828"))
                                                         .title("testTask2")
                                                         .description("testDescription2")
                                                         .assignedUser(user1)
@@ -108,14 +104,16 @@ class BoardControllerTest {
                                         .name("Test column 2")
                                         .tasks(List.of(
                                                 Task.builder()
-                                                        .id(UUID.fromString("6353831c-9f0f-4936-b0a7-89b14b7e20cc"))
+                                                        .id(UUID.fromString
+                                                                ("6353831c-9f0f-4936-b0a7-89b14b7e20cc"))
                                                         .title("testTask3")
                                                         .description("testDescription3")
                                                         .assignedUser(user2)
                                                         .priority(TaskPriority.LOW)
                                                         .build(),
                                                 Task.builder()
-                                                        .id(UUID.fromString("4125c944-b5da-4301-a3f1-d3e3052bc034"))
+                                                        .id(UUID.fromString
+                                                                ("4125c944-b5da-4301-a3f1-d3e3052bc034"))
                                                         .title("testTask5")
                                                         .description("testDescription5")
                                                         .assignedUser(null)
@@ -124,11 +122,13 @@ class BoardControllerTest {
                                         ))
                                         .build(),
                                 Column.builder()
-                                        .id(UUID.fromString("1da1f76b-7c3a-4e95-b4fe-59e71c6c7318"))
+                                        .id(UUID.fromString
+                                                ("1da1f76b-7c3a-4e95-b4fe-59e71c6c7318"))
                                         .name("Test column 3")
                                         .tasks(List.of(
                                                 Task.builder()
-                                                        .id(UUID.fromString("13bb74d2-2269-4d18-86d2-15fb5eced977"))
+                                                        .id(UUID.fromString
+                                                                ("13bb74d2-2269-4d18-86d2-15fb5eced977"))
                                                         .title("testTask4")
                                                         .description("testDescription4")
                                                         .assignedUser(user1)
@@ -261,11 +261,9 @@ class BoardControllerTest {
                         """));
     }
 
-
     @Test
     void when_AddBoard_shouldReturn200StatusCode_andNewBoard() throws Exception {
         // given
-
         UUID boardId = UUID.fromString("b4a5fdd3-b467-4c61-81b4-83a243d001e2");
         String boardName = "testowyBoard";
 
@@ -290,6 +288,7 @@ class BoardControllerTest {
 
         // when
         this.mockMvc.perform(post("/boards")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"" + boardName + "\"}"))
 
@@ -325,11 +324,13 @@ class BoardControllerTest {
     @Test
     void when_EditBoard_shouldReturn200StatusCode_andEditedBoard() throws Exception {
         // given
-        UUID boardId = UUID.fromString("2b31501a-0e74-4515-b1e6-e5a4c8518924");
+        UUID boardId = UUID.fromString
+                ("2b31501a-0e74-4515-b1e6-e5a4c8518924");
         String boardName = "testowyBoard";
 
         User user = User.builder()
-                .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
+                .id(UUID.fromString
+                        ("461c84d0-2233-433b-9784-4bf32cd81d6e"))
                 .login("testUser123")
                 .name("Someone")
                 .avatarColor("#B80000")
@@ -339,7 +340,9 @@ class BoardControllerTest {
                 .id(boardId)
                 .name(boardName)
                 .users(List.of(
-                        new BoardUser(user, BoardUserRole.BOARD_USER, Instant.parse("2023-11-11T16:37:20.806Z"))
+                                new BoardUser(user,
+                                        BoardUserRole.BOARD_USER,
+                                        Instant.parse("2023-11-11T16:37:20.806Z"))
                         )
                 )
                 .columns(
@@ -348,13 +351,16 @@ class BoardControllerTest {
 
 
         when(boardService.editBoard(boardId, new UpdateBoard(boardName, List.of(
-                new UpdateUser(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"), BoardUserRole.BOARD_USER),
-                new UpdateUser(UUID.fromString("99b65bfa-7120-11ee-b962-0242ac120002"), BoardUserRole.BOARD_USER)
+                new UpdateUser(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"),
+                        BoardUserRole.BOARD_USER),
+                new UpdateUser(UUID.fromString("99b65bfa-7120-11ee-b962-0242ac120002"),
+                        BoardUserRole.BOARD_USER)
 
         )))).thenReturn(board);
 
         // when
         this.mockMvc.perform(put("/boards/" + boardId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -404,12 +410,12 @@ class BoardControllerTest {
     @Test
     void when_DeleteBoard_shouldReturn200StatusCode() throws Exception {
         // given
-        UUID boardId = UUID.fromString("3eed8d1c-7128-11ee-b962-0242ac120002");
-
-        Mockito.doNothing().when(boardService).deleteBoard(boardId);
+        UUID boardId = UUID.fromString
+                ("3eed8d1c-7128-11ee-b962-0242ac120002");
 
         // when
-        this.mockMvc.perform(delete("/boards/3eed8d1c-7128-11ee-b962-0242ac120002"))
+        this.mockMvc.perform(delete("/boards/3eed8d1c-7128-11ee-b962-0242ac120002")
+                        .with(csrf()))
                 // then
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -421,9 +427,12 @@ class BoardControllerTest {
     void when_GetBoards_shouldReturn200StatusCode_andReturnBoardList() throws Exception {
         // given
         List<AvailableBoard> availableBoards = List.of(
-                new AvailableBoard(UUID.fromString("e769f2a6-712c-11ee-b962-0242ac120002"), "testBoard1"),
-                new AvailableBoard(UUID.fromString("06fa66aa-712d-11ee-b962-0242ac120002"), "testBoard2"),
-                new AvailableBoard(UUID.fromString("1104c2bc-712d-11ee-b962-0242ac120002"), "testBoard3")
+                new AvailableBoard(UUID.fromString("e769f2a6-712c-11ee-b962-0242ac120002"),
+                        "testBoard1"),
+                new AvailableBoard(UUID.fromString("06fa66aa-712d-11ee-b962-0242ac120002"),
+                        "testBoard2"),
+                new AvailableBoard(UUID.fromString("1104c2bc-712d-11ee-b962-0242ac120002"),
+                        "testBoard3")
         );
 
         when(boardService.getAvailableBoards()).thenReturn(
@@ -470,14 +479,16 @@ class BoardControllerTest {
 
         List<User> users = List.of(
                 User.builder()
-                        .id(UUID.fromString("23a91c24-7132-11ee-b962-0242ac120002"))
+                        .id(UUID.fromString
+                                ("23a91c24-7132-11ee-b962-0242ac120002"))
                         .login("testUser1")
                         .name("Johnny")
                         .avatarColor("#B80000")
                         .imageId(null)
                         .build(),
                 User.builder()
-                        .id(UUID.fromString("3ba2bb96-7132-11ee-b962-0242ac120002"))
+                        .id(UUID.fromString
+                                ("3ba2bb96-7132-11ee-b962-0242ac120002"))
                         .login("testUser2")
                         .name("Marry")
                         .avatarColor("#B80000")
@@ -490,7 +501,10 @@ class BoardControllerTest {
         // when
         this.mockMvc.perform(get("/boards/33e34bae-712e-11ee-b962-0242ac120002/assignable-users")
                         .queryParam("loginPhrase", loginPhrase)
-                        .queryParam("excludedUserIds", excludedUserIds.stream().map(UUID::toString).collect(Collectors.joining(",")))
+                        .queryParam("excludedUserIds", excludedUserIds
+                                .stream()
+                                .map(UUID::toString)
+                                .collect(Collectors.joining(",")))
                 )
                 // then
                 .andDo(print())

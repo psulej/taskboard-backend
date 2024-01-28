@@ -6,8 +6,6 @@ import dev.psulej.taskboard.board.service.BoardService;
 import dev.psulej.taskboard.board.service.ColumnService;
 import dev.psulej.taskboard.config.TestConfiguration;
 import dev.psulej.taskboard.security.TokenProvider;
-import dev.psulej.taskboard.board.api.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +13,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+
 import java.util.List;
 import java.util.UUID;
+
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -28,11 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ColumnController.class)
 @Import(TestConfiguration.class)
+@WithMockUser
 class ColumnControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
     @MockBean
@@ -43,11 +42,6 @@ class ColumnControllerTest {
 
     @MockBean
     ColumnService columnService;
-
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     void whenAddColumn_shouldReturn200StatusCode_andNewColumn() throws Exception {
@@ -91,6 +85,7 @@ class ColumnControllerTest {
         ).thenReturn(column);
         // when
         this.mockMvc.perform(post("/boards/d60219b8-020b-47d0-aa81-5f2365d16bdd/columns")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"" + columnName + "\"}"))
                 // then
@@ -179,6 +174,7 @@ class ColumnControllerTest {
         // when
         this.mockMvc
                 .perform(put("/boards/1a908648-71bb-11ee-b962-0242ac120002/columns/5aeb9302-71e0-11ee-b962-0242ac120002")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"" + columnName + "\"}"))
 
@@ -227,10 +223,9 @@ class ColumnControllerTest {
         UUID boardId = UUID.fromString("35830810-71e6-11ee-b962-0242ac120002");
         UUID columnId = UUID.fromString("3b7e6386-71e6-11ee-b962-0242ac120002");
 
-        Mockito.doNothing().when(columnService).deleteColumn(boardId, columnId);
-
         // when
-        this.mockMvc.perform(delete("/boards/35830810-71e6-11ee-b962-0242ac120002/columns/3b7e6386-71e6-11ee-b962-0242ac120002"))
+        this.mockMvc.perform(delete("/boards/35830810-71e6-11ee-b962-0242ac120002/columns/3b7e6386-71e6-11ee-b962-0242ac120002")
+                        .with(csrf()))
                 // then
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -262,6 +257,7 @@ class ColumnControllerTest {
 
         mockMvc.perform(put("/boards/35830810-71e6-11ee-b962-0242ac120002/columns")
                         // then
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     [

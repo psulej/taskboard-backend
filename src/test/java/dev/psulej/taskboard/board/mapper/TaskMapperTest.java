@@ -6,18 +6,17 @@ import dev.psulej.taskboard.board.domain.TaskPriority;
 import dev.psulej.taskboard.user.domain.UserEntity;
 import dev.psulej.taskboard.user.domain.UserRole;
 import org.junit.jupiter.api.Test;
-
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TaskMapperTest {
-
     private final UserMapper userMapper = new UserMapper();
     private final TaskMapper taskMapper = new TaskMapper(userMapper);
 
     @Test
     void shouldMapTask() {
+        // given
         UserEntity userEntity = UserEntity.builder()
                 .id(UUID.fromString("f6c6706a-7395-11ee-b962-0242ac120002"))
                 .login("johndoe")
@@ -35,8 +34,10 @@ class TaskMapperTest {
                 .priority(TaskPriority.NORMAL)
                 .build();
 
+        // when
         Task task = taskMapper.mapTask(taskEntity);
 
+        // then
         assertNotNull(task);
         assertEquals(taskEntity.id(), task.id());
         assertEquals(taskEntity.title(), task.title());

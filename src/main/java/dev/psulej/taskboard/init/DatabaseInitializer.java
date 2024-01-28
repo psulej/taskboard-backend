@@ -1,6 +1,6 @@
 package dev.psulej.taskboard.init;
+
 import dev.psulej.taskboard.board.domain.*;
-import dev.psulej.taskboard.board.mapper.UserMapper;
 import dev.psulej.taskboard.board.repository.BoardRepository;
 import dev.psulej.taskboard.board.repository.ColumnRepository;
 import dev.psulej.taskboard.board.repository.TaskRepository;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -31,8 +32,8 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(String... args) throws Exception {
-        if (userRepository.findAll().isEmpty() && boardRepository.findAll().isEmpty() && taskRepository.findAll().isEmpty() && columnRepository.findAll().isEmpty()) {
+    public void run(String... args) {
+        if (!isDatabaseInitialized()) {
             List<UserEntity> users = List.of(
                     UserEntity.builder()
                             .id(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
@@ -52,8 +53,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                             .user(users.get(0))
                             .joinedAt(Instant.now())
                             .role(BoardUserRole.BOARD_ADMINISTRATOR)
-                    .build());
-
+                            .build());
 
             UserSettingsEntity userSettings = UserSettingsEntity.builder()
                     .userId(UUID.fromString("461c84d0-2233-433b-9784-4bf32cd81d6e"))
@@ -62,17 +62,18 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             userSettingsRepository.save(userSettings);
 
-
             List<TaskEntity> column1Tasks = List.of(
                     TaskEntity.builder()
                             .id(UUID.fromString("de656f7a-bf69-4ac6-9216-2fb6405d5480"))
                             .title("Col1Task1")
                             .description("Col1Task1")
+                            .assignedUser(null)
                             .build(),
                     TaskEntity.builder()
                             .id(UUID.fromString("cad0fcc2-0f73-47ea-9de2-92b63270be84"))
                             .title("Col1Task2")
                             .description("Col1Task2")
+                            .assignedUser(users.get(0))
                             .build()
             );
 
@@ -81,11 +82,15 @@ public class DatabaseInitializer implements CommandLineRunner {
                             .id(UUID.fromString("6f17d5ae-b931-4de0-a8af-14d134e4c239"))
                             .title("Col2Task1")
                             .description("Col2Task1")
+                            .priority(TaskPriority.LOW)
+                            .assignedUser(users.get(0))
                             .build(),
                     TaskEntity.builder()
                             .id(UUID.fromString("b86f70df-485e-4af4-92f0-726ea7944ec3"))
                             .title("Col2Task2")
                             .description("Col2Task2")
+                            .priority(TaskPriority.HIGH)
+                            .assignedUser(null)
                             .build()
             );
 
@@ -94,11 +99,15 @@ public class DatabaseInitializer implements CommandLineRunner {
                             .id(UUID.fromString("f7efe0b1-4669-46cb-8418-35396f58e797"))
                             .title("Col3Task1")
                             .description("Col3Task1")
+                            .priority(TaskPriority.NORMAL)
+                            .assignedUser(null)
                             .build(),
                     TaskEntity.builder()
                             .id(UUID.fromString("422ad8ec-8557-49b8-a57e-4653272e4086"))
                             .title("Col3Task2")
                             .description("Col3Task2")
+                            .priority(TaskPriority.LOW)
+                            .assignedUser(null)
                             .build()
             );
 
@@ -135,5 +144,10 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             boardRepository.save(board1);
         }
+    }
+
+    private boolean isDatabaseInitialized() {
+        return Stream.of(userRepository, boardRepository, columnRepository, taskRepository)
+                .anyMatch(repository -> repository.count() != 0);
     }
 }

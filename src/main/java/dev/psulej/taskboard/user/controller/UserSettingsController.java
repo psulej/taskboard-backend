@@ -1,8 +1,9 @@
 package dev.psulej.taskboard.user.controller;
+
 import dev.psulej.taskboard.user.api.ApplicationTheme;
 import dev.psulej.taskboard.user.domain.UserSettingsEntity;
 import dev.psulej.taskboard.user.service.UserSettingsService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequestMapping("/settings")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserSettingsController {
     private final UserSettingsService userSettingsService;
 

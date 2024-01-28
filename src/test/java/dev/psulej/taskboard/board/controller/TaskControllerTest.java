@@ -8,7 +8,6 @@ import dev.psulej.taskboard.board.service.TaskService;
 import dev.psulej.taskboard.config.TestConfiguration;
 import dev.psulej.taskboard.security.TokenProvider;
 import dev.psulej.taskboard.board.api.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +15,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
 import java.util.UUID;
-
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -30,11 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TaskController.class)
 @Import(TestConfiguration.class)
+@WithMockUser
 class TaskControllerTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
     @MockBean
@@ -43,15 +39,9 @@ class TaskControllerTest {
     @MockBean
     TaskService taskService;
 
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
     @Test
     void whenAddTask_shouldReturn200StatusCode_andNewTask() throws Exception {
         // given
-
         UUID boardId = UUID.fromString("5623603c-7386-11ee-b962-0242ac120002");
         UUID columnId = UUID.fromString("71bf4932-7386-11ee-b962-0242ac120002");
 
@@ -76,7 +66,9 @@ class TaskControllerTest {
                 .thenReturn(task);
 
         // when
-        this.mockMvc.perform(post("/boards/5623603c-7386-11ee-b962-0242ac120002/columns/71bf4932-7386-11ee-b962-0242ac120002/tasks")
+        this.mockMvc.perform(post("/boards/5623603c-7386-11ee-b962-0242ac120002/columns/" +
+                        "71bf4932-7386-11ee-b962-0242ac120002/tasks")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
@@ -116,11 +108,9 @@ class TaskControllerTest {
     @Test
     void whenEditTask_shouldReturn200StatusCode_andEditedTask() throws Exception {
         // given
-
         UUID boardId = UUID.fromString("7d4230a4-738a-11ee-b962-0242ac120002");
         UUID columnId = UUID.fromString("801fd5f6-738a-11ee-b962-0242ac120002");
         UUID taskId = UUID.fromString("825d0456-738a-11ee-b962-0242ac120002");
-
         UUID assignedUserId = UUID.fromString("825d0456-738a-11ee-b962-0242ac120002");
 
         User assignedUser = User.builder()
@@ -143,18 +133,21 @@ class TaskControllerTest {
                 new UpdateTask("taskTitle", "taskDescription", assignedUserId, TaskPriority.LOW)))
                 .thenReturn(task);
 
-        this.mockMvc.perform(put("/boards/7d4230a4-738a-11ee-b962-0242ac120002/columns/801fd5f6-738a-11ee-b962-0242ac120002/tasks/825d0456-738a-11ee-b962-0242ac120002")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                        """
-                                        {
-                                            "title" : "taskTitle",
-                                            "description" : "taskDescription",
-                                            "priority" : "LOW",
-                                            "assignedUserId" : "825d0456-738a-11ee-b962-0242ac120002"                   
-                                        }
+        // when
+        this.mockMvc.perform(put("/boards/7d4230a4-738a-11ee-b962-0242ac120002/columns/" +
+                        "801fd5f6-738a-11ee-b962-0242ac120002/tasks/825d0456-738a-11ee-b962-0242ac120002")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
                                 """
-                ))
+                                                {
+                                                    "title" : "taskTitle",
+                                                    "description" : "taskDescription",
+                                                    "priority" : "LOW",
+                                                    "assignedUserId" : "825d0456-738a-11ee-b962-0242ac120002"                   
+                                                }
+                                        """
+                        ))
                 // then
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -182,15 +175,20 @@ class TaskControllerTest {
 
     @Test
     void whenDeleteTask_shouldReturn200StatusCode() throws Exception {
+        // given
         UUID boardId = UUID.fromString("7d4230a4-738a-11ee-b962-0242ac120002");
         UUID columnId = UUID.fromString("801fd5f6-738a-11ee-b962-0242ac120002");
         UUID taskId = UUID.fromString("825d0456-738a-11ee-b962-0242ac120002");
 
-        Mockito.doNothing().when(taskService).deleteTask(boardId,columnId,taskId);
         // when
-        this.mockMvc.perform(delete("/boards/7d4230a4-738a-11ee-b962-0242ac120002/columns/801fd5f6-738a-11ee-b962-0242ac120002/tasks/825d0456-738a-11ee-b962-0242ac120002"))
+        this.mockMvc.perform(delete("/boards/7d4230a4-738a-11ee-b962-0242ac120002/columns/" +
+                        "801fd5f6-738a-11ee-b962-0242ac120002/tasks/825d0456-738a-11ee-b962-0242ac120002")
+                        .with(csrf())
+                )
                 // then
                 .andDo(print())
                 .andExpect(status().isOk());
+
+        Mockito.verify(taskService).deleteTask(boardId,columnId,taskId);
     }
 }

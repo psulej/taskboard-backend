@@ -1,13 +1,10 @@
 package dev.psulej.taskboard.board.controller;
 
-import dev.psulej.taskboard.board.api.AvailableBoard;
-import dev.psulej.taskboard.board.api.Board;
-import dev.psulej.taskboard.board.api.CreateBoard;
-import dev.psulej.taskboard.board.api.UpdateBoard;
+import dev.psulej.taskboard.board.api.*;
 import dev.psulej.taskboard.board.service.BoardService;
-import dev.psulej.taskboard.board.api.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +22,7 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
+    @PreAuthorize("hasRole('USER')")
     public Board getBoard(@PathVariable UUID boardId) {
         return boardService.getBoard(boardId);
     }

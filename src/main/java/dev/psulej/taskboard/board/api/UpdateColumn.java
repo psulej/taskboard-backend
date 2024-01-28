@@ -1,4 +1,5 @@
 package dev.psulej.taskboard.board.api;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

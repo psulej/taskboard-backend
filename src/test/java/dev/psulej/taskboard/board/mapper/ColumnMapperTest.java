@@ -13,14 +13,13 @@ import java.util.List;
 import java.util.UUID;
 
 class ColumnMapperTest {
-
     private final UserMapper userMapper = new UserMapper();
     private final TaskMapper taskMapper = new TaskMapper(userMapper);
     private final ColumnMapper columnMapper = new ColumnMapper(taskMapper);
 
     @Test
     void shouldMapColumn() {
-
+        // given
         UserEntity userEntity = UserEntity.builder()
                 .id(UUID.fromString("122aa72a-7393-11ee-b962-0242ac120002"))
                 .login("johndoe")
@@ -53,7 +52,10 @@ class ColumnMapperTest {
                 )
                 .build();
 
+        // when
         Column column = columnMapper.mapColumn(columnEntity);
+
+        // then
         assertThat(column).isNotNull();
         assertThat(column.name()).isEqualTo("testColumn1");
         assertThat(column.tasks()).hasSize(2);
@@ -106,7 +108,4 @@ class ColumnMapperTest {
         Task taskWithNullUser = column.tasks().get(0);
         assertThat(taskWithNullUser.assignedUser()).isNull();
     }
-
-
-
 }

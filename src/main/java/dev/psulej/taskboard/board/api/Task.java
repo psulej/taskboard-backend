@@ -1,7 +1,7 @@
 package dev.psulej.taskboard.board.api;
+
 import dev.psulej.taskboard.board.domain.TaskPriority;
 import lombok.Builder;
-
 
 import java.util.UUID;
 

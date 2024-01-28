@@ -1,6 +1,6 @@
 package dev.psulej.taskboard.board.api;
-import lombok.Builder;
 
+import lombok.Builder;
 
 import java.util.List;
 import java.util.UUID;
